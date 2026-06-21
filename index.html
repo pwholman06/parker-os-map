@@ -836,17 +836,27 @@ function getCountdown(schedule) {
 }
 
 // ── Stats bar ──────────────────────────────────────────────────
-function updateStats(meta) {
+function updateStats(meta, runtimeMeta) {
   $('st-nodes').textContent = `${meta.node_count||0} nodes`;
   $('st-edges').textContent = `${meta.edge_count||0} edges`;
-  const sc = meta.status_counts || {};
+  // Recount from allNodes so runtime overrides are reflected
+  const sc = {};
+  for (const n of allNodes) sc[n.status] = (sc[n.status]||0) + 1;
   $('st-auto').textContent   = sc.autonomous    || 0;
   $('st-tested').textContent = sc.tested        || 0;
   $('st-needs').textContent  = sc.needs_testing || 0;
   $('st-broken').textContent = sc.broken        || 0;
-  if (meta.generated_at) {
+  if (runtimeMeta?.updated_at) {
+    const ts   = new Date(runtimeMeta.updated_at);
+    const mins = Math.round((Date.now() - ts) / 60000);
+    const ago  = mins < 2 ? 'just now' : mins < 60 ? `${mins}m ago` : `${Math.floor(mins/60)}h ago`;
+    const el   = $('st-ts');
+    el.textContent = `synced ${ago}`;
+    el.title       = `Last sync: ${ts.toLocaleString()}`;
+    el.style.color = '#22c55e';
+  } else if (meta.generated_at) {
     const ts = new Date(meta.generated_at);
-    $('st-ts').textContent = `updated ${ts.toLocaleDateString()} ${ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+    $('st-ts').textContent = `map built ${ts.toLocaleDateString()} ${ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
   }
 }
 
@@ -866,7 +876,25 @@ async function init() {
   allNodes = data.nodes;
   for (const n of allNodes) nodeById[n.id] = n;
 
-  updateStats(data.meta || {});
+  // Apply runtime status overrides (pushed by system-map-update task at 5:30 AM/PM)
+  let runtimeMeta = null;
+  try {
+    const rr = await fetch('data/runtime_status.json');
+    if (rr.ok) {
+      runtimeMeta = await rr.json();
+      const overrides = runtimeMeta.statuses || {};
+      let overrideCount = 0;
+      for (const n of allNodes) {
+        if (overrides[n.id] && overrides[n.id] !== n.status) {
+          n.status = overrides[n.id];
+          overrideCount++;
+        }
+      }
+      if (overrideCount) console.log(`[system-map] Applied ${overrideCount} runtime status override(s)`);
+    }
+  } catch(_) { /* runtime_status.json is optional */ }
+
+  updateStats(data.meta || {}, runtimeMeta);
 
   const { dNodes, dEdges } = buildDisplayGraph(allNodes, data.edges || []);
   dispNodes = dNodes;
