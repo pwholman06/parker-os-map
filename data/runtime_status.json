@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-21T20:01:08.951Z",
+  "updated_at": "2026-06-21T21:30:42.918Z",
   "source": "trigger.dev_api",
   "run_count_fetched": 25,
   "statuses": {
@@ -15,6 +15,6 @@
     "task_weekly_content_plan": "needs_testing",
     "task_schedule_post": "autonomous",
     "task_square_weekly": "needs_testing",
-    "task_system_map_update": "broken"
+    "task_system_map_update": "autonomous"
   }
 }
