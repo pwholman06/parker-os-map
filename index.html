@@ -4,768 +4,771 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Parker OS — System Map</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-  :root {
-    --bg: #08080f;
-    --surface: #0f0f1a;
-    --surface2: #16162a;
-    --border: rgba(255,255,255,0.07);
-    --text: #e2e8f0;
-    --text-muted: #64748b;
-    --text-dim: #334155;
-    --green:  #22c55e;
-    --orange: #f97316;
-    --yellow: #eab308;
-    --red:    #ef4444;
-    --font: 'Space Grotesk', system-ui, sans-serif;
-    --mono: 'JetBrains Mono', monospace;
-  }
+:root {
+  --bg: #08080f;
+  --surface: #0f0f1c;
+  --surface2: #151524;
+  --border: rgba(255,255,255,0.07);
+  --text: #e2e8f0;
+  --text-muted: #64748b;
+  --text-dim: #2a2a40;
+  --font: 'Space Grotesk', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
 
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font);
-    overflow: hidden;
-  }
+html,body { height:100%; background:var(--bg); color:var(--text); font-family:var(--font); overflow:hidden; }
 
-  /* dot-grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: radial-gradient(circle, #1e1e38 1px, transparent 1px);
-    background-size: 28px 28px;
-    opacity: 0.45;
-    pointer-events: none;
-    z-index: 0;
-  }
+body::before {
+  content:''; position:fixed; inset:0;
+  background-image: radial-gradient(circle,#1c1c38 1px,transparent 1px);
+  background-size:28px 28px; opacity:0.4; pointer-events:none; z-index:0;
+}
 
-  /* ── Header ── */
-  header {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 0 20px;
-    background: rgba(8,8,15,0.85);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-    z-index: 100;
-  }
+/* ── Header ─────────────────────────────────────────────────── */
+header {
+  position:fixed; top:0; left:0; right:0; height:52px;
+  display:flex; align-items:center; gap:14px; padding:0 18px;
+  background:rgba(8,8,15,0.88); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border); z-index:200;
+}
+.logo { font-size:14px; font-weight:700; letter-spacing:.06em; white-space:nowrap; flex-shrink:0; }
+.logo span { color:#22c55e; text-shadow:0 0 10px rgba(34,197,94,.5); }
+.vdiv { width:1px; height:22px; background:var(--border); flex-shrink:0; }
 
-  .logo {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    color: var(--text);
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .logo span {
-    color: var(--green);
-    text-shadow: 0 0 12px rgba(34,197,94,0.5);
-  }
+.filters { display:flex; align-items:center; gap:6px; overflow-x:auto; flex:1; }
+.filter-group { display:flex; gap:3px; flex-shrink:0; }
 
-  .divider { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
+.pill {
+  padding:3px 9px; border-radius:999px;
+  border:1px solid var(--border); background:transparent;
+  color:var(--text-muted); font-family:var(--font); font-size:10.5px;
+  font-weight:500; letter-spacing:.03em; cursor:pointer;
+  transition:all .14s; white-space:nowrap;
+}
+.pill:hover { border-color:rgba(255,255,255,.18); color:var(--text); }
+.pill.active { color:var(--text); background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.2); }
+.pill.active[data-domain="investing"]         { color:#3b82f6; border-color:#3b82f6; }
+.pill.active[data-domain="social"]            { color:#a855f7; border-color:#a855f7; }
+.pill.active[data-domain="espresso_yourself"] { color:#f59e0b; border-color:#f59e0b; }
+.pill.active[data-domain="finance"]           { color:#10b981; border-color:#10b981; }
+.pill.active[data-domain="infrastructure"]    { color:#94a3b8; border-color:#94a3b8; }
+.pill.active[data-domain="comms"]             { color:#ec4899; border-color:#ec4899; }
+.pill.active[data-status="autonomous"]    { color:#22c55e; border-color:#22c55e; }
+.pill.active[data-status="tested"]        { color:#f97316; border-color:#f97316; }
+.pill.active[data-status="needs_testing"] { color:#eab308; border-color:#eab308; }
+.pill.active[data-status="broken"]        { color:#ef4444; border-color:#ef4444; }
 
-  /* pill filter groups */
-  .filters {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    flex: 1;
-  }
-  .filter-group {
-    display: flex;
-    gap: 4px;
-    flex-shrink: 0;
-  }
-  .pill {
-    padding: 4px 10px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-muted);
-    font-family: var(--font);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.03em;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .pill:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
-  .pill.active {
-    border-color: currentColor;
-    color: var(--text);
-    background: rgba(255,255,255,0.05);
-    box-shadow: 0 0 8px rgba(255,255,255,0.1);
-  }
-  .pill.active.domain-investing  { color: #3b82f6; border-color: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.3); }
-  .pill.active.domain-social     { color: #a855f7; border-color: #a855f7; box-shadow: 0 0 8px rgba(168,85,247,0.3); }
-  .pill.active.domain-ey         { color: #f59e0b; border-color: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,0.3); }
-  .pill.active.domain-finance    { color: #10b981; border-color: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.3); }
-  .pill.active.domain-infra      { color: #94a3b8; border-color: #94a3b8; box-shadow: 0 0 8px rgba(148,163,184,0.2); }
-  .pill.active.domain-comms      { color: #ec4899; border-color: #ec4899; box-shadow: 0 0 8px rgba(236,72,153,0.3); }
-  .pill.active.status-autonomous { color: #22c55e; border-color: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.3); }
-  .pill.active.status-tested     { color: #f97316; border-color: #f97316; box-shadow: 0 0 8px rgba(249,115,22,0.3); }
-  .pill.active.status-needs_testing { color: #eab308; border-color: #eab308; box-shadow: 0 0 8px rgba(234,179,8,0.3); }
-  .pill.active.status-broken     { color: #ef4444; border-color: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.3); }
+.search-wrap { position:relative; flex-shrink:0; }
+.search-wrap input {
+  width:148px; padding:4px 9px 4px 26px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:6px; color:var(--text); font-family:var(--mono);
+  font-size:10.5px; outline:none; transition:border-color .14s;
+}
+.search-wrap input:focus { border-color:rgba(255,255,255,.2); }
+.search-wrap::before {
+  content:'⌕'; position:absolute; left:7px; top:50%;
+  transform:translateY(-50%); color:var(--text-muted); font-size:12px; pointer-events:none;
+}
 
-  .search-wrap {
-    position: relative;
-    flex-shrink: 0;
-  }
-  .search-wrap input {
-    width: 160px;
-    padding: 5px 10px 5px 28px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 11px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  .search-wrap input:focus { border-color: rgba(255,255,255,0.2); }
-  .search-wrap::before {
-    content: '⌕';
-    position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-size: 13px;
-    pointer-events: none;
-  }
+.header-btn {
+  padding:4px 10px; border-radius:6px; border:1px solid var(--border);
+  background:transparent; color:var(--text-muted); font-family:var(--font);
+  font-size:10.5px; cursor:pointer; white-space:nowrap; flex-shrink:0;
+  transition:all .14s;
+}
+.header-btn:hover { border-color:rgba(255,255,255,.2); color:var(--text); }
 
-  /* ── Canvas ── */
-  #network {
-    position: fixed;
-    top: 56px; left: 0; right: 0; bottom: 32px;
-    z-index: 1;
-  }
+/* ── Viewport + Canvas ───────────────────────────────────────── */
+#viewport {
+  position:fixed; top:52px; left:0; right:0; bottom:28px;
+  overflow:hidden; cursor:grab; z-index:1;
+}
+#viewport.grabbing { cursor:grabbing; }
 
-  /* ── Tooltip ── */
-  #tooltip {
-    position: fixed;
-    display: none;
-    max-width: 280px;
-    padding: 14px 16px;
-    background: rgba(8, 8, 15, 0.72);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
-    z-index: 200;
-    pointer-events: none;
-    font-size: 12px;
-    line-height: 1.5;
-  }
-  .tt-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-  .tt-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--surface2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
-    overflow: hidden;
-  }
-  .tt-icon img { width: 16px; height: 16px; object-fit: contain; }
-  .tt-title { font-weight: 600; font-size: 13px; color: var(--text); }
-  .tt-badge {
-    margin-left: auto;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    border: 1px solid currentColor;
-    flex-shrink: 0;
-  }
-  .badge-autonomous { color: #22c55e; background: rgba(34,197,94,0.1); }
-  .badge-tested { color: #f97316; background: rgba(249,115,22,0.1); }
-  .badge-needs_testing { color: #eab308; background: rgba(234,179,8,0.1); }
-  .badge-broken { color: #ef4444; background: rgba(239,68,68,0.1); }
-  .tt-desc { color: var(--text-muted); font-size: 11px; margin-bottom: 6px; }
-  .tt-row {
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
-    color: var(--text-muted);
-    font-size: 11px;
-    margin-top: 4px;
-  }
-  .tt-row .label { color: var(--text-dim); font-family: var(--mono); min-width: 52px; flex-shrink: 0; }
-  .tt-row .val { color: var(--text-muted); font-family: var(--mono); word-break: break-all; }
-  .tt-row .val.path { color: #6366f1; }
-  .tt-notes {
-    margin-top: 8px;
-    padding: 6px 8px;
-    background: rgba(239,68,68,0.08);
-    border-left: 2px solid #ef4444;
-    border-radius: 4px;
-    color: #fca5a5;
-    font-size: 10px;
-    line-height: 1.4;
-  }
-  .tt-countdown {
-    margin-top: 6px;
-    color: #818cf8;
-    font-family: var(--mono);
-    font-size: 10px;
-  }
+#canvas {
+  position:absolute; top:0; left:0;
+  transform-origin:0 0;
+  will-change:transform;
+}
 
-  /* ── Legend ── */
-  #legend {
-    position: fixed;
-    bottom: 40px;
-    right: 16px;
-    background: rgba(8,8,15,0.82);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    z-index: 100;
-    font-size: 11px;
-  }
-  .legend-title { font-weight: 600; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
-  .legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; color: var(--text-muted); }
-  .legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    border: 2px solid currentColor;
-    flex-shrink: 0;
-  }
-  .legend-dot.green  { color: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
-  .legend-dot.orange { color: #f97316; box-shadow: 0 0 6px rgba(249,115,22,0.4); }
-  .legend-dot.yellow { color: #eab308; box-shadow: 0 0 6px rgba(234,179,8,0.4); }
-  .legend-dot.red    { color: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.4); }
-  .legend-sep { border-top: 1px solid var(--border); margin: 8px 0; }
-  .legend-size-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; color: var(--text-muted); }
-  .legend-circle {
-    border: 1.5px solid #475569;
-    border-radius: 50%;
-    background: #12121e;
-    flex-shrink: 0;
-  }
+/* ── Swimlane bands ──────────────────────────────────────────── */
+.swimlane {
+  position:absolute; border-radius:12px;
+  border:1px solid;
+}
+.swimlane-header {
+  position:absolute; top:0; left:0; right:0; height:36px;
+  display:flex; align-items:center; gap:7px;
+  padding:0 12px; border-radius:11px 11px 0 0;
+}
+.sl-emoji { font-size:13px; line-height:1; }
+.sl-name {
+  font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+}
+.sl-health {
+  margin-left:auto; font-size:9.5px; font-family:var(--mono);
+  opacity:.6; background:rgba(0,0,0,.3); padding:1px 6px; border-radius:999px;
+}
 
-  /* ── Stats bar ── */
-  #statsbar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    padding: 0 16px;
-    gap: 20px;
-    background: rgba(8,8,15,0.9);
-    border-top: 1px solid var(--border);
-    z-index: 100;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-dim);
-  }
-  #statsbar span b { color: var(--text-muted); }
-  .stat-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+/* ── Column headers ──────────────────────────────────────────── */
+.col-hdr {
+  position:absolute; font-size:10px; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--text-dim);
+  border-bottom:1px solid var(--text-dim); padding-bottom:4px;
+}
 
-  /* ── Pulse animation for broken nodes ── */
-  @keyframes broken-pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.45; }
-  }
+/* ── Services panel ──────────────────────────────────────────── */
+.svc-panel {
+  position:absolute; border-radius:12px;
+  border:1px solid rgba(255,255,255,.05);
+  background:rgba(255,255,255,.015);
+}
+.svc-panel-title {
+  position:absolute; top:0; left:0; right:0; height:36px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--text-dim);
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+
+/* ── Node cards ──────────────────────────────────────────────── */
+.node-card {
+  position:absolute; display:flex; align-items:center; gap:9px;
+  border-radius:9px; padding:0 10px 0 0;
+  border:1px solid rgba(255,255,255,.07);
+  border-left:3px solid;
+  background:var(--surface2);
+  cursor:pointer; transition:background .12s, box-shadow .12s;
+  overflow:hidden; user-select:none;
+}
+.node-card:hover {
+  background:#1c1c30;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  border-color:rgba(255,255,255,.14);
+}
+.node-card.dimmed { opacity:.07; pointer-events:none; }
+.node-card.highlighted { box-shadow:0 0 0 2px rgba(99,102,241,.6), 0 4px 20px rgba(0,0,0,.5); }
+
+.nc-icon {
+  width:36px; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; flex-shrink:0;
+  border-right:1px solid rgba(255,255,255,.06);
+}
+.nc-icon img { width:15px; height:15px; object-fit:contain; }
+
+.nc-body { flex:1; min-width:0; padding:7px 0; }
+.nc-label { font-size:11px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.nc-meta  { font-size:9px; color:var(--text-muted); margin-top:1px; text-transform:uppercase; letter-spacing:.04em; }
+
+.nc-dot {
+  width:6px; height:6px; border-radius:50%; flex-shrink:0; margin-right:2px;
+}
+
+/* domain cards (swimlane anchor labels — not rendered) */
+
+/* ── Tooltip ─────────────────────────────────────────────────── */
+#tooltip {
+  position:fixed; display:none; max-width:268px; z-index:500;
+  padding:12px 14px; pointer-events:none;
+  background:rgba(8,8,15,.78); backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.1); border-radius:11px;
+  box-shadow:0 8px 28px rgba(0,0,0,.65);
+}
+.tt-head { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+.tt-ico { width:26px; height:26px; border-radius:7px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+.tt-ico img { width:14px; height:14px; object-fit:contain; }
+.tt-title { font-weight:600; font-size:12.5px; color:var(--text); }
+.tt-badge {
+  margin-left:auto; padding:2px 7px; border-radius:999px;
+  font-size:9.5px; font-weight:600; letter-spacing:.05em; text-transform:uppercase;
+  border:1px solid currentColor; flex-shrink:0;
+}
+.badge-autonomous    { color:#22c55e; background:rgba(34,197,94,.08); }
+.badge-tested        { color:#f97316; background:rgba(249,115,22,.08); }
+.badge-needs_testing { color:#eab308; background:rgba(234,179,8,.08); }
+.badge-broken        { color:#ef4444; background:rgba(239,68,68,.08); }
+.tt-desc { font-size:10.5px; color:var(--text-muted); line-height:1.45; margin-bottom:5px; }
+.tt-row  { display:flex; gap:6px; font-size:10px; margin-top:3px; }
+.tt-row .lbl { color:var(--text-dim); font-family:var(--mono); min-width:48px; flex-shrink:0; }
+.tt-row .val { color:var(--text-muted); font-family:var(--mono); word-break:break-all; }
+.tt-notes { margin-top:7px; padding:5px 7px; background:rgba(239,68,68,.07); border-left:2px solid #ef4444; border-radius:4px; font-size:9.5px; color:#fca5a5; }
+.tt-cta   { margin-top:7px; font-size:9.5px; color:#6366f1; }
+
+/* ── Legend ──────────────────────────────────────────────────── */
+#legend {
+  position:fixed; bottom:36px; right:14px;
+  background:rgba(8,8,15,.85); backdrop-filter:blur(14px);
+  border:1px solid var(--border); border-radius:10px;
+  padding:10px 13px; z-index:200; font-size:10.5px;
+}
+.leg-title { font-size:9.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); margin-bottom:6px; }
+.leg-row { display:flex; align-items:center; gap:7px; margin-bottom:4px; color:var(--text-muted); }
+.leg-dot { width:9px; height:9px; border-radius:50%; border:2px solid currentColor; flex-shrink:0; }
+.green  { color:#22c55e; } .orange { color:#f97316; } .yellow { color:#eab308; } .red { color:#ef4444; }
+.glow-g { box-shadow:0 0 5px rgba(34,197,94,.55); } .glow-r { box-shadow:0 0 5px rgba(239,68,68,.55); }
+
+/* ── Stats bar ───────────────────────────────────────────────── */
+#statsbar {
+  position:fixed; bottom:0; left:0; right:0; height:28px;
+  display:flex; align-items:center; padding:0 14px; gap:16px;
+  background:rgba(8,8,15,.92); border-top:1px solid var(--border);
+  z-index:200; font-family:var(--mono); font-size:9.5px; color:var(--text-dim);
+}
+.sdot { display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:3px; vertical-align:middle; }
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo">Parker<span>OS</span> · System Map</div>
-  <div class="divider"></div>
+  <div class="vdiv"></div>
 
-  <div class="filters" id="filters">
-    <!-- Domain filters -->
-    <div class="filter-group" id="domain-filters">
-      <button class="pill active" data-filter-type="domain" data-filter-value="all">All</button>
-      <button class="pill domain-investing" data-filter-type="domain" data-filter-value="investing">Investing</button>
-      <button class="pill domain-social" data-filter-type="domain" data-filter-value="social">Social</button>
-      <button class="pill domain-ey" data-filter-type="domain" data-filter-value="espresso_yourself">EY Coffee</button>
-      <button class="pill domain-finance" data-filter-type="domain" data-filter-value="finance">Finance</button>
-      <button class="pill domain-infra" data-filter-type="domain" data-filter-value="infrastructure">Infra</button>
-      <button class="pill domain-comms" data-filter-type="domain" data-filter-value="comms">Comms</button>
+  <div class="filters">
+    <div class="filter-group" id="domain-pills">
+      <button class="pill active" data-filter="domain" data-val="all">All</button>
+      <button class="pill" data-filter="domain" data-val="investing" data-domain="investing">Investing</button>
+      <button class="pill" data-filter="domain" data-val="social" data-domain="social">Social</button>
+      <button class="pill" data-filter="domain" data-val="espresso_yourself" data-domain="espresso_yourself">EY Coffee</button>
+      <button class="pill" data-filter="domain" data-val="finance" data-domain="finance">Finance</button>
+      <button class="pill" data-filter="domain" data-val="infrastructure" data-domain="infrastructure">Infra</button>
+      <button class="pill" data-filter="domain" data-val="comms" data-domain="comms">Comms</button>
     </div>
-
-    <div class="divider"></div>
-
-    <!-- Status filters -->
-    <div class="filter-group" id="status-filters">
-      <button class="pill active" data-filter-type="status" data-filter-value="all">All Status</button>
-      <button class="pill status-autonomous" data-filter-type="status" data-filter-value="autonomous">Autonomous</button>
-      <button class="pill status-tested" data-filter-type="status" data-filter-value="tested">Tested</button>
-      <button class="pill status-needs_testing" data-filter-type="status" data-filter-value="needs_testing">Needs Test</button>
-      <button class="pill status-broken" data-filter-type="status" data-filter-value="broken">Broken</button>
+    <div class="vdiv"></div>
+    <div class="filter-group" id="status-pills">
+      <button class="pill active" data-filter="status" data-val="all">All Status</button>
+      <button class="pill" data-filter="status" data-val="autonomous" data-status="autonomous">Autonomous</button>
+      <button class="pill" data-filter="status" data-val="tested" data-status="tested">Tested</button>
+      <button class="pill" data-filter="status" data-val="needs_testing" data-status="needs_testing">Needs Test</button>
+      <button class="pill" data-filter="status" data-val="broken" data-status="broken">Broken</button>
     </div>
-
-    <div class="divider"></div>
-
-    <!-- Type filters -->
-    <div class="filter-group" id="type-filters">
-      <button class="pill active" data-filter-type="nodetype" data-filter-value="all">All Types</button>
-      <button class="pill" data-filter-type="nodetype" data-filter-value="trigger_task">Automations</button>
-      <button class="pill" data-filter-type="nodetype" data-filter-value="tool">Tools</button>
-      <button class="pill" data-filter-type="nodetype" data-filter-value="service">Services</button>
-    </div>
-
-    <div class="divider"></div>
-
+    <div class="vdiv"></div>
     <div class="search-wrap">
-      <input type="text" id="search" placeholder="Search nodes..." autocomplete="off" spellcheck="false">
+      <input type="text" id="search" placeholder="Search nodes…" autocomplete="off" spellcheck="false">
     </div>
+    <div class="vdiv"></div>
+    <button class="header-btn" id="fit-btn">⊡ Fit All</button>
   </div>
 </header>
 
-<div id="network"></div>
+<div id="viewport">
+  <div id="canvas">
+    <svg id="edges-svg" style="position:absolute;top:0;left:0;pointer-events:none;overflow:visible"></svg>
+    <div id="bg-layer"></div>
+    <div id="node-layer"></div>
+  </div>
+</div>
 
 <div id="tooltip"></div>
 
 <div id="legend">
-  <div class="legend-title">Status</div>
-  <div class="legend-row"><div class="legend-dot green"></div> Autonomous</div>
-  <div class="legend-row"><div class="legend-dot orange"></div> Tested</div>
-  <div class="legend-row"><div class="legend-dot yellow"></div> Needs Testing</div>
-  <div class="legend-row"><div class="legend-dot red"></div> Broken</div>
-  <div class="legend-sep"></div>
-  <div class="legend-title">Node Type</div>
-  <div class="legend-size-row"><div class="legend-circle" style="width:20px;height:20px;"></div> Domain</div>
-  <div class="legend-size-row"><div class="legend-circle" style="width:13px;height:13px;"></div> Task / Bridge</div>
-  <div class="legend-size-row"><div class="legend-circle" style="width:9px;height:9px;"></div> Tool</div>
-  <div class="legend-size-row"><div class="legend-circle" style="width:11px;height:11px;border-style:dashed;"></div> Service</div>
+  <div class="leg-title">Status</div>
+  <div class="leg-row"><div class="leg-dot green glow-g"></div> Autonomous</div>
+  <div class="leg-row"><div class="leg-dot orange"></div> Tested</div>
+  <div class="leg-row"><div class="leg-dot yellow"></div> Needs Testing</div>
+  <div class="leg-row"><div class="leg-dot red glow-r"></div> Broken</div>
 </div>
 
 <div id="statsbar">
-  <span id="stat-nodes">— nodes</span>
-  <span id="stat-edges">— edges</span>
+  <span id="st-nodes">—</span>
+  <span id="st-edges">—</span>
   <span>
-    <span class="stat-dot" style="background:#22c55e;box-shadow:0 0 4px #22c55e;"></span><span id="stat-auto">0</span> autonomous
-    &nbsp;
-    <span class="stat-dot" style="background:#f97316;"></span><span id="stat-tested">0</span> tested
-    &nbsp;
-    <span class="stat-dot" style="background:#eab308;"></span><span id="stat-needs">0</span> needs testing
-    &nbsp;
-    <span class="stat-dot" style="background:#ef4444;box-shadow:0 0 4px #ef4444;"></span><span id="stat-broken">0</span> broken
+    <span class="sdot" style="background:#22c55e;box-shadow:0 0 4px #22c55e"></span><span id="st-auto">0</span>
+    &thinsp;<span class="sdot" style="background:#f97316"></span><span id="st-tested">0</span>
+    &thinsp;<span class="sdot" style="background:#eab308"></span><span id="st-needs">0</span>
+    &thinsp;<span class="sdot" style="background:#ef4444"></span><span id="st-broken">0</span>
   </span>
-  <span id="stat-ts" style="margin-left:auto;"></span>
+  <span id="st-ts" style="margin-left:auto"></span>
 </div>
 
 <script>
-const STATUS_COLORS = {
-  autonomous:    '#22c55e',
-  tested:        '#f97316',
-  needs_testing: '#eab308',
-  broken:        '#ef4444',
+// ── Constants ─────────────────────────────────────────────────
+const STATUS_COLOR = { autonomous:'#22c55e', tested:'#f97316', needs_testing:'#eab308', broken:'#ef4444' };
+const DOMAIN_COLOR = {
+  investing:'#3b82f6', social:'#a855f7', espresso_yourself:'#f59e0b',
+  finance:'#10b981', infrastructure:'#64748b', comms:'#ec4899'
 };
+const DOMAIN_ICON  = { investing:'📈', social:'📱', espresso_yourself:'☕', finance:'💰', infrastructure:'⚙️', comms:'✉️' };
+const DOMAIN_LABEL = { investing:'Investing', social:'Social / Brand', espresso_yourself:'Espresso Yourself', finance:'Finance', infrastructure:'Infrastructure', comms:'Comms' };
+const DOMAIN_ORDER = ['investing','social','espresso_yourself','finance','infrastructure','comms'];
 
-const DOMAIN_COLORS = {
-  investing:         '#3b82f6',
-  social:            '#a855f7',
-  espresso_yourself: '#f59e0b',
-  finance:           '#10b981',
-  infrastructure:    '#64748b',
-  comms:             '#ec4899',
-};
+// Layout
+const NODE_W = 190, NODE_H = 52, ROW_H = 64;
+const LANE_TOP = 38, LANE_BOT = 18, LANE_GAP = 10;
+const PAD_X = 22, PAD_TOP = 52;
 
-const TYPE_SIZES = {
-  domain:       55,
-  trigger_task: 30,
-  api_bridge:   34,
-  workflow:     24,
-  tool:         18,
-  service:      24,
-};
+const COL_LABEL_W = 142, COL_GAP = 16;
+const COL_LABEL_X = PAD_X;
+const COL_TASK_X  = COL_LABEL_X + COL_LABEL_W + COL_GAP;
+const COL_TOOL_X  = COL_TASK_X  + NODE_W + COL_GAP;
+const COL_SVC_X   = COL_TOOL_X  + NODE_W + 40;
+const CANVAS_W    = COL_SVC_X   + NODE_W + PAD_X;
 
-function getNodeColor(node) {
-  const border = STATUS_COLORS[node.status] || '#475569';
-  const domainColor = DOMAIN_COLORS[node.domain] || '#475569';
-  const bg = hexToRgba(domainColor, 0.10);
-  return {
-    background: bg,
-    border: border,
-    highlight: { background: hexToRgba(domainColor, 0.2), border: border },
-    hover:      { background: hexToRgba(domainColor, 0.16), border: border },
-  };
-}
+// ── State ──────────────────────────────────────────────────────
+let pan = { x: 24, y: 24 }, zoom = 0.82;
+let dragging = false, dragStart = { x:0, y:0 }, panStart = { x:0, y:0 };
+let activeFilter = { domain:'all', status:'all' };
+let allNodes = [], nodeById = {}, positions = {};
 
-function hexToRgba(hex, alpha) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
-  return `rgba(${r},${g},${b},${alpha})`;
-}
+// ── Helpers ───────────────────────────────────────────────────
+const hex2rgba = (h,a) => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; };
+const $ = id => document.getElementById(id);
 
-function buildVisNode(n) {
-  const size = TYPE_SIZES[n.type] || 18;
-  const isDomain = n.type === 'domain';
-  const isService = n.type === 'service';
-  const borderWidth = isDomain ? 2 : 3;
-  const borderWidthSelected = borderWidth + 2;
+// ── Layout computation ────────────────────────────────────────
+function computeLayout(nodes) {
+  const byDomain = {};
+  const services = [];
+  for (const d of DOMAIN_ORDER) byDomain[d] = { tasks:[], tools:[] };
 
-  // Label: domain nodes show sub-label (health score)
-  let displayLabel = n.label;
-  if (isDomain && n.sub_label) {
-    displayLabel = `${n.label}\n${n.sub_label}`;
+  for (const n of nodes) {
+    if (n.type === 'domain') continue;
+    if (n.type === 'service') { services.push(n); continue; }
+    const d = n.domain;
+    if (!byDomain[d]) continue;
+    if (['trigger_task','workflow'].includes(n.type)) byDomain[d].tasks.push(n);
+    else if (['tool','api_bridge'].includes(n.type))  byDomain[d].tools.push(n);
   }
 
-  let shape = 'dot';
-  let image = null;
-  if (isService && n.icon_url) {
-    shape = 'circularImage';
-    image = n.icon_url;
+  const pos = {}, bands = [];
+  let cy = PAD_TOP;
+
+  for (const d of DOMAIN_ORDER) {
+    const { tasks, tools } = byDomain[d];
+    const rows = Math.max(tasks.length, tools.length, 1);
+    const bandH = LANE_TOP + rows * ROW_H + LANE_BOT;
+
+    bands.push({ domain:d, y:cy, h:bandH, rows });
+
+    const taskOff = Math.max(0, (rows - tasks.length) / 2 * ROW_H);
+    const toolOff = Math.max(0, (rows - tools.length) / 2 * ROW_H);
+
+    tasks.forEach((n,i) => pos[n.id] = { x:COL_TASK_X, y:cy + LANE_TOP + taskOff + i * ROW_H });
+    tools.forEach((n,i) => pos[n.id] = { x:COL_TOOL_X, y:cy + LANE_TOP + toolOff + i * ROW_H });
+
+    cy += bandH + LANE_GAP;
   }
 
-  const vis = {
-    id: n.id,
-    label: displayLabel,
-    title: '', // suppress default tooltip
-    size,
-    shape,
-    color: getNodeColor(n),
-    borderWidth,
-    borderWidthSelected,
-    font: {
-      color: isDomain ? (DOMAIN_COLORS[n.domain] || '#e2e8f0') : '#cbd5e1',
-      size: isDomain ? 13 : 10,
-      face: 'Space Grotesk, system-ui',
-      bold: { color: '#e2e8f0', size: isDomain ? 14 : 11 },
-      multi: 'html',
-    },
-    shadow: { enabled: true, color: STATUS_COLORS[n.status] || '#000', size: 12, x: 0, y: 0 },
-    _raw: n,
-  };
+  // Services: assign primary domain by first-referencing node
+  const svcPrimary = {};
+  for (const d of DOMAIN_ORDER) {
+    const all = [...byDomain[d].tasks, ...byDomain[d].tools];
+    for (const n of all)
+      for (const dep of (n.depends_on||[]))
+        if (!svcPrimary[dep]) svcPrimary[dep] = d;
+  }
 
-  if (image) vis.image = image;
+  const svcByDomain = {};
+  const svcUnassigned = [];
+  for (const svc of services) {
+    const d = svcPrimary[svc.id];
+    if (d) { (svcByDomain[d] = svcByDomain[d]||[]).push(svc); }
+    else svcUnassigned.push(svc);
+  }
 
-  if (n.x != null) vis.x = n.x;
-  if (n.y != null) vis.y = n.y;
-  if (n.fixed) vis.fixed = n.fixed;
+  for (const band of bands) {
+    const svcs = svcByDomain[band.domain] || [];
+    svcs.forEach((svc,i) => pos[svc.id] = { x:COL_SVC_X, y: band.y + LANE_TOP + i * ROW_H });
+  }
 
-  return vis;
+  let extra = cy + 10;
+  for (const svc of svcUnassigned) { pos[svc.id] = { x:COL_SVC_X, y:extra }; extra += ROW_H; }
+
+  const totalH = Math.max(extra, cy) + PAD_TOP;
+  return { pos, bands, totalH };
 }
 
-function buildVisEdge(e) {
-  return {
-    from: e.from,
-    to: e.to,
-    arrows: { to: { enabled: true, scaleFactor: 0.5, type: 'arrow' } },
-    color: { color: 'rgba(100,116,139,0.25)', highlight: 'rgba(99,102,241,0.7)', hover: 'rgba(99,102,241,0.5)' },
-    width: 1,
-    smooth: { type: 'continuous', roundness: 0.25 },
-    selectionWidth: 2,
-    hoverWidth: 1.5,
-    dashes: false,
-  };
+// ── Render swimlanes + column headers ────────────────────────
+function renderBackground(bands, totalH) {
+  const bg = $('bg-layer');
+  bg.innerHTML = '';
+
+  // Column headers (inside canvas, rendered once)
+  const hdrs = [
+    { label:'Automations', x:COL_TASK_X },
+    { label:'Tools',       x:COL_TOOL_X },
+    { label:'Services',    x:COL_SVC_X  },
+  ];
+  for (const h of hdrs) {
+    const el = document.createElement('div');
+    el.className = 'col-hdr';
+    el.style.cssText = `left:${h.x}px;top:${PAD_TOP-26}px;width:${NODE_W}px;text-align:left`;
+    el.textContent = h.label;
+    bg.appendChild(el);
+  }
+
+  // Services panel
+  const sp = document.createElement('div');
+  sp.className = 'svc-panel';
+  sp.style.cssText = `left:${COL_SVC_X-10}px;top:${PAD_TOP-10}px;width:${NODE_W+20}px;height:${totalH - PAD_TOP + 10}px`;
+  sp.innerHTML = '';
+  bg.appendChild(sp);
+
+  // Swimlane bands
+  for (const band of bands) {
+    const dc = DOMAIN_COLOR[band.domain];
+    const el = document.createElement('div');
+    el.className = 'swimlane';
+    el.dataset.domain = band.domain;
+    el.style.cssText = `left:${COL_LABEL_X}px;top:${band.y}px;width:${COL_SVC_X - COL_LABEL_X - 24}px;height:${band.h}px`;
+    el.style.background = hex2rgba(dc, 0.035);
+    el.style.borderColor = hex2rgba(dc, 0.15);
+
+    // Health ratio
+    const domNodes = allNodes.filter(n => n.domain === band.domain && n.type !== 'domain');
+    const autoCount = domNodes.filter(n => n.status==='autonomous').length;
+    const health = domNodes.length ? `${autoCount}/${domNodes.length} auto` : '';
+
+    el.innerHTML = `
+      <div class="swimlane-header">
+        <span class="sl-emoji">${DOMAIN_ICON[band.domain]||'◎'}</span>
+        <span class="sl-name" style="color:${dc}">${DOMAIN_LABEL[band.domain]}</span>
+        <span class="sl-health">${health}</span>
+      </div>`;
+    bg.appendChild(el);
+  }
 }
 
-// ── ET timezone next-run countdown ──────────────────────────────────────────
-function nextRunCountdown(schedule) {
+// ── Render node cards ─────────────────────────────────────────
+function renderNodes(nodes, pos) {
+  const layer = $('node-layer');
+  layer.innerHTML = '';
+
+  for (const n of nodes) {
+    if (n.type === 'domain') continue;
+    const p = pos[n.id];
+    if (!p) continue;
+
+    const sc = STATUS_COLOR[n.status] || '#475569';
+    const dc = DOMAIN_COLOR[n.domain]  || '#475569';
+
+    const iconHtml = n.icon_url
+      ? `<img src="${n.icon_url}" width="15" height="15" onerror="this.outerHTML='<span>${(n.icon_value||'').slice(0,2)}</span>'">`
+      : `<span>${n.icon_type==='emoji' ? n.icon_value : (n.icon_value||'--').slice(0,2)}</span>`;
+
+    const card = document.createElement('div');
+    card.className = 'node-card';
+    card.dataset.id     = n.id;
+    card.dataset.domain = n.domain;
+    card.dataset.status = n.status;
+    card.dataset.type   = n.type;
+    card.style.cssText  = `left:${p.x}px;top:${p.y}px;width:${NODE_W}px;height:${NODE_H}px;border-left-color:${sc};`;
+
+    card.innerHTML = `
+      <div class="nc-icon" style="background:${hex2rgba(dc,.12)};color:${hex2rgba(dc,.9)}">${iconHtml}</div>
+      <div class="nc-body">
+        <div class="nc-label">${n.label}</div>
+        <div class="nc-meta">${n.type.replace(/_/g,' ')}</div>
+      </div>
+      <div class="nc-dot" style="background:${sc};box-shadow:0 0 5px ${sc}88"></div>`;
+
+    card.addEventListener('mouseenter', e => showTip(n, e));
+    card.addEventListener('mousemove',  e => moveTip(e));
+    card.addEventListener('mouseleave', hideTip);
+    card.addEventListener('click', e => { e.stopPropagation(); handleClick(n); });
+    layer.appendChild(card);
+  }
+}
+
+// ── Render SVG edges ──────────────────────────────────────────
+function renderEdges(edges, pos) {
+  const svg = $('edges-svg');
+  svg.innerHTML = `
+    <defs>
+      <marker id="arr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+        <path d="M0,0.5 L6,3.5 L0,6.5" fill="none" stroke="rgba(99,102,241,0.55)" stroke-width="1.2"/>
+      </marker>
+    </defs>`;
+
+  const TYPE_COL = {
+    trigger_task:2, workflow:2,
+    api_bridge:3, tool:3,
+    service:4,
+  };
+  const nodeType = {};
+  for (const n of allNodes) nodeType[n.id] = n.type;
+
+  const drawn = new Set();
+
+  for (const e of edges) {
+    const fp = pos[e.from], tp = pos[e.to];
+    if (!fp || !tp) continue;
+
+    const fc = TYPE_COL[nodeType[e.from]] || 0;
+    const tc = TYPE_COL[nodeType[e.to]]   || 0;
+    if (fc >= tc) continue;   // only forward edges (left → right)
+
+    const key = `${e.from}→${e.to}`;
+    if (drawn.has(key)) continue;
+    drawn.add(key);
+
+    const x1 = fp.x + NODE_W, y1 = fp.y + NODE_H/2;
+    const x2 = tp.x,           y2 = tp.y + NODE_H/2;
+    const mx = (x1+x2)/2;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke','rgba(99,102,241,0.3)');
+    path.setAttribute('stroke-width','1.4');
+    path.setAttribute('marker-end','url(#arr)');
+    path.dataset.from = e.from;
+    path.dataset.to   = e.to;
+    svg.appendChild(path);
+  }
+}
+
+// ── Pan & Zoom ────────────────────────────────────────────────
+function applyTransform() {
+  $('canvas').style.transform = `translate(${pan.x}px,${pan.y}px) scale(${zoom})`;
+}
+
+function fitAll(totalH) {
+  const vw = $('viewport').offsetWidth, vh = $('viewport').offsetHeight;
+  const scaleX = (vw - 48) / CANVAS_W;
+  const scaleH = (vh - 48) / totalH;
+  zoom = Math.min(scaleX, scaleH, 1.0);
+  pan.x = Math.max(24, (vw - CANVAS_W * zoom) / 2);
+  pan.y = 24;
+  applyTransform();
+}
+
+function setupPanZoom(totalH) {
+  const vp = $('viewport');
+
+  vp.addEventListener('mousedown', e => {
+    if (e.button !== 0 || e.target !== vp && e.target !== $('canvas') && e.target.id !== 'bg-layer') return;
+    dragging = true;
+    dragStart = { x:e.clientX, y:e.clientY };
+    panStart  = { x:pan.x, y:pan.y };
+    vp.classList.add('grabbing');
+    // deselect highlight
+    clearHighlight();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    pan.x = panStart.x + (e.clientX - dragStart.x);
+    pan.y = panStart.y + (e.clientY - dragStart.y);
+    applyTransform();
+  });
+  window.addEventListener('mouseup', () => { dragging = false; $('viewport').classList.remove('grabbing'); });
+
+  vp.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = vp.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const delta = e.deltaY > 0 ? 0.88 : 1/0.88;
+    const nz = Math.min(Math.max(zoom * delta, 0.15), 3);
+    pan.x = mx - (mx - pan.x) * (nz / zoom);
+    pan.y = my - (my - pan.y) * (nz / zoom);
+    zoom = nz;
+    applyTransform();
+  }, { passive:false });
+
+  $('fit-btn').addEventListener('click', () => fitAll(totalH));
+
+  // Click on empty canvas = clear highlight
+  $('canvas').addEventListener('click', clearHighlight);
+}
+
+// ── Highlight ─────────────────────────────────────────────────
+let highlighted = null;
+
+function handleClick(n) {
+  if (n.github_url) { window.open(n.github_url,'_blank'); return; }
+  if (highlighted === n.id) { clearHighlight(); return; }
+  highlighted = n.id;
+
+  // Find connected node ids
+  const connected = new Set([n.id]);
+  for (const e of $('edges-svg').querySelectorAll('path[data-from]')) {
+    if (e.dataset.from === n.id) connected.add(e.dataset.to);
+    if (e.dataset.to   === n.id) connected.add(e.dataset.from);
+  }
+
+  // Dim non-connected cards
+  for (const card of $('node-layer').querySelectorAll('.node-card')) {
+    if (connected.has(card.dataset.id)) card.classList.remove('dimmed');
+    else card.classList.add('dimmed');
+    card.classList.toggle('highlighted', card.dataset.id === n.id);
+  }
+
+  // Highlight/dim edges
+  for (const path of $('edges-svg').querySelectorAll('path[data-from]')) {
+    const edgeConnected = connected.has(path.dataset.from) && connected.has(path.dataset.to);
+    path.setAttribute('stroke', edgeConnected ? 'rgba(99,102,241,0.7)' : 'rgba(99,102,241,0.06)');
+    path.setAttribute('stroke-width', edgeConnected ? '2' : '0.8');
+  }
+}
+
+function clearHighlight() {
+  highlighted = null;
+  for (const card of $('node-layer').querySelectorAll('.node-card'))
+    card.classList.remove('dimmed','highlighted');
+  for (const path of $('edges-svg').querySelectorAll('path[data-from]')) {
+    path.setAttribute('stroke','rgba(99,102,241,0.3)');
+    path.setAttribute('stroke-width','1.4');
+  }
+}
+
+// ── Filters ────────────────────────────────────────────────────
+function applyFilters() {
+  const { domain, status } = activeFilter;
+  const searchQ = $('search').value.toLowerCase().trim();
+
+  let any = false;
+  for (const card of $('node-layer').querySelectorAll('.node-card')) {
+    const dm = card.dataset.domain, st = card.dataset.status, id = card.dataset.id;
+    const n = nodeById[id];
+    const domainOk  = domain === 'all' || dm === domain;
+    const statusOk  = status === 'all' || st === status;
+    const searchOk  = !searchQ || (n.label.toLowerCase().includes(searchQ) || (n.description||'').toLowerCase().includes(searchQ));
+    const show = domainOk && statusOk && searchOk;
+    card.classList.toggle('dimmed', !show);
+    if (show) any = true;
+  }
+
+  // Dim edges if either endpoint is dimmed
+  for (const path of $('edges-svg').querySelectorAll('path[data-from]')) {
+    const fd = $('node-layer').querySelector(`[data-id="${path.dataset.from}"]`);
+    const td = $('node-layer').querySelector(`[data-id="${path.dataset.to}"]`);
+    const show = fd && !fd.classList.contains('dimmed') && td && !td.classList.contains('dimmed');
+    path.setAttribute('stroke', show ? 'rgba(99,102,241,0.3)' : 'rgba(99,102,241,0.04)');
+  }
+}
+
+function setupFilters() {
+  for (const pill of document.querySelectorAll('.pill')) {
+    pill.addEventListener('click', () => {
+      const type = pill.dataset.filter, val = pill.dataset.val;
+      pill.closest('.filter-group').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeFilter[type] = val;
+      clearHighlight();
+      applyFilters();
+    });
+  }
+  $('search').addEventListener('input', () => { clearHighlight(); applyFilters(); });
+}
+
+// ── Tooltip ────────────────────────────────────────────────────
+let tipTimer = null;
+const tip = $('tooltip');
+
+function showTip(n, e) {
+  clearTimeout(tipTimer);
+  tipTimer = setTimeout(() => {
+    const sc = STATUS_COLOR[n.status] || '#475569';
+    const iconHtml = n.icon_url
+      ? `<img src="${n.icon_url}" width="14" height="14" onerror="this.style.display='none'">`
+      : `<span style="font-size:12px">${n.icon_type==='emoji'?n.icon_value:(n.icon_value||'').slice(0,2)}</span>`;
+    const statusLabel = { autonomous:'Autonomous', tested:'Tested', needs_testing:'Needs Testing', broken:'Broken' };
+    const countdown = getCountdown(n.schedule);
+
+    tip.innerHTML = `
+      <div class="tt-head">
+        <div class="tt-ico">${iconHtml}</div>
+        <div class="tt-title">${n.label}</div>
+        <span class="tt-badge badge-${n.status}">${statusLabel[n.status]||n.status}</span>
+      </div>
+      <div class="tt-desc">${n.description||''}</div>
+      ${n.schedule?`<div class="tt-row"><span class="lbl">schedule</span><span class="val">${n.schedule}</span></div>`:''}
+      ${countdown?`<div class="tt-row"><span class="lbl">next run</span><span class="val" style="color:#818cf8">${countdown}</span></div>`:''}
+      ${n.file_path?`<div class="tt-row"><span class="lbl">path</span><span class="val" style="color:#6366f1">${n.file_path}</span></div>`:''}
+      ${n.notes?`<div class="tt-notes">⚠ ${n.notes}</div>`:''}
+      ${n.github_url?`<div class="tt-cta">↗ Click to open on GitHub</div>`:''}`;
+    tip.style.display = 'block';
+    moveTip(e);
+  }, 100);
+}
+function moveTip(e) {
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  let tx = e.clientX + 14, ty = e.clientY - 10;
+  if (tx + tw > window.innerWidth  - 8) tx = e.clientX - tw - 14;
+  if (ty + th > window.innerHeight - 36) ty = window.innerHeight - th - 36;
+  if (ty < 58) ty = 58;
+  tip.style.left = tx+'px'; tip.style.top = ty+'px';
+}
+function hideTip() { clearTimeout(tipTimer); tipTimer = setTimeout(() => tip.style.display='none', 120); }
+
+function getCountdown(schedule) {
   if (!schedule) return null;
-  const now = new Date();
-  const m = schedule.match(/(\d{1,2}):(\d{2})\s*(AM|PM)\s*ET\s*(Mon[^\s]*)?/i);
+  const m = schedule.match(/(\d{1,2}):(\d{2})\s*(AM|PM)\s*ET/i);
   if (!m) return null;
-
-  let hour = parseInt(m[1]);
-  const min = parseInt(m[2]);
-  const ampm = m[3].toUpperCase();
-  if (ampm === 'PM' && hour !== 12) hour += 12;
-  if (ampm === 'AM' && hour === 12) hour = 0;
-
-  // Current ET time (rough: UTC-4 for EDT, UTC-5 for EST)
-  const utcOffset = -4; // EDT
-  const etNow = new Date(now.getTime() + (now.getTimezoneOffset() + utcOffset * 60) * 60000);
-
-  const target = new Date(etNow);
-  target.setHours(hour, min, 0, 0);
-  if (target <= etNow) target.setDate(target.getDate() + 1);
-
-  // If Mon-Fri only, skip weekend
-  const dayString = (m[4] || '').toLowerCase();
-  if (dayString.includes('mon')) {
-    while ([0, 6].includes(target.getDay())) {
-      target.setDate(target.getDate() + 1);
-    }
+  let h = parseInt(m[1]), min = parseInt(m[2]);
+  if (m[3].toUpperCase()==='PM' && h!==12) h+=12;
+  if (m[3].toUpperCase()==='AM' && h===12) h=0;
+  const now = new Date();
+  const et = new Date(now.getTime() + (now.getTimezoneOffset() + (-4)*60)*60000);
+  const tgt = new Date(et); tgt.setHours(h,min,0,0);
+  if (tgt <= et) tgt.setDate(tgt.getDate()+1);
+  if (schedule.toLowerCase().includes('mon')) {
+    while([0,6].includes(tgt.getDay())) tgt.setDate(tgt.getDate()+1);
   }
-
-  const diffMs = target - etNow;
-  const diffH = Math.floor(diffMs / 3600000);
-  const diffMin = Math.floor((diffMs % 3600000) / 60000);
-  return `Runs in ${diffH}h ${diffMin}m (ET)`;
+  const diff = tgt - et;
+  return `in ${Math.floor(diff/3600000)}h ${Math.floor((diff%3600000)/60000)}m`;
 }
 
-// ── Tooltip rendering ────────────────────────────────────────────────────────
-const tooltip = document.getElementById('tooltip');
-let tooltipTimer = null;
-
-function showTooltip(node, x, y) {
-  const n = node._raw;
-  const statusLabel = { autonomous: 'Autonomous', tested: 'Tested', needs_testing: 'Needs Testing', broken: 'Broken' };
-  const iconHtml = n.icon_url
-    ? `<img src="${n.icon_url}" onerror="this.style.display='none'">`
-    : `<span style="font-size:13px">${n.icon_type === 'emoji' ? n.icon_value : (n.icon_value || '').slice(0,2)}</span>`;
-
-  const countdown = nextRunCountdown(n.schedule);
-
-  let html = `
-    <div class="tt-header">
-      <div class="tt-icon">${iconHtml}</div>
-      <div class="tt-title">${n.label}</div>
-      <span class="tt-badge badge-${n.status}">${statusLabel[n.status] || n.status}</span>
-    </div>
-    <div class="tt-desc">${n.description || ''}</div>
-  `;
-
-  if (n.schedule) {
-    html += `<div class="tt-row"><span class="label">schedule</span><span class="val">${n.schedule}</span></div>`;
+// ── Stats bar ──────────────────────────────────────────────────
+function updateStats(meta, nodes) {
+  $('st-nodes').textContent = `${meta.node_count||0} nodes`;
+  $('st-edges').textContent = `${meta.edge_count||0} edges`;
+  const sc = meta.status_counts || {};
+  $('st-auto').textContent   = sc.autonomous    || 0;
+  $('st-tested').textContent = sc.tested        || 0;
+  $('st-needs').textContent  = sc.needs_testing || 0;
+  $('st-broken').textContent = sc.broken        || 0;
+  if (meta.generated_at) {
+    const ts = new Date(meta.generated_at);
+    $('st-ts').textContent = `updated ${ts.toLocaleDateString()} ${ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
   }
-  if (countdown) {
-    html += `<div class="tt-countdown">⏱ ${countdown}</div>`;
-  }
-  if (n.file_path) {
-    html += `<div class="tt-row"><span class="label">path</span><span class="val path">${n.file_path}</span></div>`;
-  }
-  if (n.sub_label && n.type === 'domain') {
-    html += `<div class="tt-row"><span class="label">health</span><span class="val">${n.sub_label}</span></div>`;
-  }
-  if (n.notes) {
-    html += `<div class="tt-notes">⚠ ${n.notes}</div>`;
-  }
-  if (n.github_url) {
-    html += `<div class="tt-row" style="margin-top:8px;"><span class="label" style="color:#6366f1;">↗ click</span><span class="val" style="color:#818cf8;">open on GitHub</span></div>`;
-  }
-
-  tooltip.innerHTML = html;
-  tooltip.style.display = 'block';
-  positionTooltip(x, y);
 }
 
-function positionTooltip(x, y) {
-  const tw = tooltip.offsetWidth, th = tooltip.offsetHeight;
-  const vw = window.innerWidth, vh = window.innerHeight;
-  let tx = x + 14, ty = y - 10;
-  if (tx + tw > vw - 10) tx = x - tw - 14;
-  if (ty + th > vh - 40) ty = vh - th - 44;
-  if (ty < 60) ty = 60;
-  tooltip.style.left = tx + 'px';
-  tooltip.style.top  = ty + 'px';
-}
-
-function hideTooltip() {
-  tooltip.style.display = 'none';
-}
-
-// ── Main ─────────────────────────────────────────────────────────────────────
+// ── Init ───────────────────────────────────────────────────────
 async function init() {
   let data;
   try {
-    const resp = await fetch('data/map.json');
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    data = await resp.json();
-  } catch (e) {
-    document.getElementById('network').innerHTML =
-      `<div style="color:#ef4444;padding:40px;font-family:monospace;font-size:13px;">
-        Failed to load data/map.json.<br>Run: python3 tools/system_map/generate_map.py<br><br>${e.message}
-      </div>`;
+    const r = await fetch('data/map.json');
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    data = await r.json();
+  } catch(e) {
+    $('viewport').innerHTML = `<div style="color:#ef4444;padding:48px 32px;font-family:monospace;font-size:13px">
+      Failed to load data/map.json<br><br>Run: python3 tools/system_map/generate_map.py<br><br>${e.message}</div>`;
     return;
   }
 
-  // Update stats bar
-  const m = data.meta || {};
-  document.getElementById('stat-nodes').textContent = `${m.node_count || 0} nodes`;
-  document.getElementById('stat-edges').textContent = `${m.edge_count || 0} edges`;
-  const sc = m.status_counts || {};
-  document.getElementById('stat-auto').textContent   = sc.autonomous || 0;
-  document.getElementById('stat-tested').textContent = sc.tested || 0;
-  document.getElementById('stat-needs').textContent  = sc.needs_testing || 0;
-  document.getElementById('stat-broken').textContent = sc.broken || 0;
-  if (m.generated_at) {
-    const ts = new Date(m.generated_at);
-    document.getElementById('stat-ts').textContent = `updated ${ts.toLocaleDateString()} ${ts.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
-  }
+  allNodes = data.nodes;
+  for (const n of allNodes) nodeById[n.id] = n;
 
-  const visNodes = new vis.DataSet(data.nodes.map(buildVisNode));
-  const visEdges = new vis.DataSet(data.edges.map(buildVisEdge));
+  updateStats(data.meta || {}, allNodes);
 
-  const container = document.getElementById('network');
-  const network = new vis.Network(container, { nodes: visNodes, edges: visEdges }, {
-    nodes: {
-      borderWidth: 3,
-      shapeProperties: { borderDashes: false, interpolation: false },
-    },
-    edges: {},
-    physics: {
-      enabled: true,
-      solver: 'forceAtlas2Based',
-      forceAtlas2Based: {
-        gravitationalConstant: -90,
-        centralGravity: 0.004,
-        springLength: 130,
-        springConstant: 0.07,
-        damping: 0.65,
-        avoidOverlap: 0.85,
-      },
-      stabilization: { enabled: true, iterations: 500, updateInterval: 25, fit: true },
-    },
-    interaction: {
-      hover: true,
-      tooltipDelay: 9999,
-      navigationButtons: false,
-      keyboard: { enabled: true, speed: { x: 10, y: 10, zoom: 0.02 } },
-      zoomView: true,
-      dragView: true,
-    },
-    layout: { improvedLayout: false },
-  });
+  const { pos, bands, totalH } = computeLayout(allNodes);
+  positions = pos;
 
-  network.on('stabilizationIterationsDone', () => {
-    network.setOptions({ physics: { enabled: false } });
-    network.fit({ animation: { duration: 800, easingFunction: 'easeInOutQuad' } });
-  });
+  $('canvas').style.width  = CANVAS_W + 'px';
+  $('canvas').style.height = totalH + 'px';
+  $('edges-svg').setAttribute('width',  CANVAS_W);
+  $('edges-svg').setAttribute('height', totalH);
 
-  // Mouse position tracker (needed for tooltip placement)
-  let mouseX = 0, mouseY = 0;
-  container.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+  renderBackground(bands, totalH);
+  renderNodes(allNodes, pos);
+  renderEdges(data.edges || [], pos);
 
-  // Tooltip on hover
-  network.on('hoverNode', (params) => {
-    clearTimeout(tooltipTimer);
-    tooltipTimer = setTimeout(() => {
-      const node = visNodes.get(params.node);
-      if (node) showTooltip(node, mouseX, mouseY);
-    }, 120);
-  });
-  network.on('blurNode', () => {
-    clearTimeout(tooltipTimer);
-    tooltipTimer = setTimeout(hideTooltip, 200);
-  });
-  container.addEventListener('mouseleave', () => { clearTimeout(tooltipTimer); hideTooltip(); });
+  setupPanZoom(totalH);
+  setupFilters();
 
-  // Click: open GitHub file or highlight neighborhood
-  network.on('click', (params) => {
-    hideTooltip();
-    if (params.nodes.length === 1) {
-      const node = visNodes.get(params.nodes[0]);
-      if (node && node._raw.github_url) {
-        window.open(node._raw.github_url, '_blank');
-        return;
-      }
-      // Highlight 1-hop neighborhood
-      const connectedEdges = network.getConnectedEdges(params.nodes[0]);
-      const connectedNodes = network.getConnectedNodes(params.nodes[0]);
-      const allNodeIds = visNodes.getIds();
-      const allEdgeIds = visEdges.getIds();
-
-      const focusSet = new Set([params.nodes[0], ...connectedNodes]);
-      const focusEdges = new Set(connectedEdges);
-
-      visNodes.update(allNodeIds.map(id => ({
-        id,
-        opacity: focusSet.has(id) ? 1.0 : 0.06,
-      })));
-      visEdges.update(allEdgeIds.map(id => ({
-        id,
-        color: focusEdges.has(id)
-          ? { color: 'rgba(99,102,241,0.7)', inherit: false }
-          : { color: 'rgba(30,30,50,0.2)', inherit: false },
-        width: focusEdges.has(id) ? 2 : 0.5,
-      })));
-    } else {
-      // Deselect — restore all
-      restoreAll(visNodes, visEdges);
-    }
-  });
-
-  // ── Filtering ──────────────────────────────────────────────────────────────
-  let activeFilters = { domain: 'all', status: 'all', nodetype: 'all' };
-
-  function applyFilters() {
-    const { domain, status, nodetype } = activeFilters;
-    const allIds = visNodes.getIds();
-    visNodes.update(allIds.map(id => {
-      const n = visNodes.get(id)._raw;
-      const domainMatch  = domain === 'all'  || n.domain === domain;
-      const statusMatch  = status === 'all'  || n.status === status;
-      const typeMatch    = nodetype === 'all' || n.type === nodetype;
-      const visible = domainMatch && statusMatch && typeMatch;
-      return { id, opacity: visible ? 1.0 : 0.05 };
-    }));
-    restoreEdgeColors(visNodes, visEdges);
-  }
-
-  document.querySelectorAll('.pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const type = btn.dataset.filterType;
-      const val  = btn.dataset.filterValue;
-
-      // Update active pill in group
-      btn.closest('.filter-group').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-
-      activeFilters[type] = val;
-      applyFilters();
-    });
-  });
-
-  // ── Search ────────────────────────────────────────────────────────────────
-  document.getElementById('search').addEventListener('input', (e) => {
-    const q = e.target.value.toLowerCase().trim();
-    if (!q) { restoreAll(visNodes, visEdges); return; }
-    const allIds = visNodes.getIds();
-    const matches = [];
-    visNodes.update(allIds.map(id => {
-      const n = visNodes.get(id);
-      const hit = n._raw.label.toLowerCase().includes(q) || (n._raw.description || '').toLowerCase().includes(q);
-      if (hit) matches.push(id);
-      return { id, opacity: hit ? 1.0 : 0.05 };
-    }));
-    if (matches.length === 1) {
-      network.focus(matches[0], { scale: 1.5, animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
-    } else if (matches.length > 1) {
-      network.fit({ nodes: matches, animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
-    }
-  });
-
-  function restoreAll(nodes, edges) {
-    nodes.update(nodes.getIds().map(id => ({ id, opacity: 1.0 })));
-    restoreEdgeColors(nodes, edges);
-  }
-
-  function restoreEdgeColors(nodes, edges) {
-    edges.update(edges.getIds().map(id => ({
-      id,
-      color: { color: 'rgba(100,116,139,0.2)', inherit: false },
-      width: 1,
-    })));
-  }
+  // Initial fit
+  const vw = $('viewport').offsetWidth, vh = $('viewport').offsetHeight;
+  const scaleX = (vw - 48) / CANVAS_W;
+  const scaleH = (vh - 48) / totalH;
+  zoom = Math.min(scaleX, 0.88);
+  pan.x = Math.max(24, (vw - CANVAS_W * zoom) / 2);
+  pan.y = 24;
+  applyTransform();
 }
 
 init();
