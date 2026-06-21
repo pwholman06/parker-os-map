@@ -296,143 +296,215 @@ const DOMAIN_COLOR = {
 const DOMAIN_ICON  = { investing:'📈', social:'📱', espresso_yourself:'☕', finance:'💰', infrastructure:'⚙️', comms:'✉️' };
 const DOMAIN_LABEL = { investing:'Investing', social:'Social / Brand', espresso_yourself:'Espresso Yourself', finance:'Finance', infrastructure:'Infrastructure', comms:'Comms' };
 const DOMAIN_ORDER = ['investing','social','espresso_yourself','finance','infrastructure','comms'];
-// Two domains side-by-side per row: [left, right]
 const DOMAIN_PAIRS = [
   ['investing',      'social'],
   ['finance',        'espresso_yourself'],
   ['infrastructure', 'comms'],
 ];
 
-// Layout
-const NODE_W = 190, NODE_H = 52, ROW_H = 64;
-const LANE_TOP = 38, LANE_BOT = 18, LANE_GAP = 14;
-const PAD_X = 22, PAD_TOP = 52;
+// Layout — tree mode: auto → tools → services, each branch self-contained
+const NODE_W = 182, NODE_H = 48, ROW_H = 60;
+const AUTO_GAP = 12;   // px gap between automation groups in a domain
+const LANE_TOP = 40, LANE_BOT = 22, LANE_GAP = 14;
+const PAD_X = 20, PAD_TOP = 52;
 
-const COL_LABEL_W = 142, COL_GAP = 16;
+const COL_LABEL_W = 118, COL_GAP = 14;
 const COL_LABEL_X = PAD_X;
-const COL_TASK_X  = COL_LABEL_X + COL_LABEL_W + COL_GAP;
-const COL_TOOL_X  = COL_TASK_X  + NODE_W + COL_GAP;
-const COL_SVC_X   = COL_TOOL_X  + NODE_W + 40;
-const HALF_W      = COL_SVC_X   + NODE_W + PAD_X;   // width of one column
-const COL_OFFSET  = HALF_W + 24;                      // x-start of right column
-const CANVAS_W    = COL_OFFSET   + HALF_W;
+const COL_TASK_X  = COL_LABEL_X + COL_LABEL_W + COL_GAP;  // 152
+const COL_TOOL_X  = COL_TASK_X  + NODE_W + COL_GAP;        // 348
+const COL_SVC_X   = COL_TOOL_X  + NODE_W + COL_GAP;        // 544
+const HALF_W      = COL_SVC_X   + NODE_W + PAD_X;          // 746
+const COL_OFFSET  = HALF_W + 22;                            // 768
+const CANVAS_W    = COL_OFFSET   + HALF_W;                  // 1514
 
 // ── State ──────────────────────────────────────────────────────
-let pan = { x: 24, y: 24 }, zoom = 0.82;
+let pan = { x: 24, y: 24 }, zoom = 0.8;
 let dragging = false, dragStart = { x:0, y:0 }, panStart = { x:0, y:0 };
 let activeFilter = { domain:'all', status:'all' };
-let allNodes = [], nodeById = {}, positions = {};
+let allNodes = [], nodeById = {};
+let dispNodes = [], dispEdges = [];
 
 // ── Helpers ───────────────────────────────────────────────────
 const hex2rgba = (h,a) => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; };
 const $ = id => document.getElementById(id);
 
-// ── Layout computation (2-column grid) ───────────────────────
-function computeLayout(nodes, edges) {
-  // Build dependency map from edges (nodes in map.json don't carry depends_on)
-  const depOf = {}; // nodeId -> [ids it points to]
+// ── Build expanded display graph ──────────────────────────────
+// Each automation gets its own branch: auto → tool instances → service instances.
+// Tools and services appear once per parent (duplication is intentional).
+// All instances within a domain are tagged with that domain so layout groups them correctly.
+function buildDisplayGraph(nodes, edges) {
+  const depOf = {};
   for (const e of edges) (depOf[e.from] = depOf[e.from]||[]).push(e.to);
 
   const byDomain = {};
-  const services = [];
-  for (const d of DOMAIN_ORDER) byDomain[d] = { tasks:[], tools:[] };
+  for (const d of DOMAIN_ORDER) byDomain[d] = { autos:[], tools:[] };
 
   for (const n of nodes) {
     if (n.type === 'domain') continue;
-    if (n.type === 'service') { services.push(n); continue; }
     const d = n.domain;
-    if (!byDomain[d]) continue;
-    if (['trigger_task','workflow'].includes(n.type)) byDomain[d].tasks.push(n);
-    else if (['tool','api_bridge'].includes(n.type))  byDomain[d].tools.push(n);
+    if (!d || !byDomain[d]) continue;
+    if (['trigger_task','workflow'].includes(n.type)) byDomain[d].autos.push(n);
+    else if (['tool','api_bridge'].includes(n.type)) byDomain[d].tools.push(n);
+  }
+
+  const dNodes = [], dEdges = [];
+
+  function addNode(original, displayId, domainOverride) {
+    dNodes.push({ ...original, id: displayId, originalId: original.id, domain: domainOverride || original.domain });
+  }
+
+  for (const d of DOMAIN_ORDER) {
+    const { autos, tools } = byDomain[d];
+    const claimedToolIds = new Set();
+
+    for (const auto of autos) {
+      addNode(auto, auto.id, d);   // automations keep their real ID (unique per domain)
+
+      const toolDeps = (depOf[auto.id]||[]).map(id => nodeById[id])
+        .filter(n => n && ['tool','api_bridge'].includes(n.type));
+
+      const directSvcDeps = (depOf[auto.id]||[]).map(id => nodeById[id])
+        .filter(n => n?.type === 'service');
+
+      for (const tool of toolDeps) {
+        claimedToolIds.add(tool.id);
+        const tInst = `${tool.id}::${auto.id}`;
+        addNode(tool, tInst, d);
+        dEdges.push({ from: auto.id, to: tInst });
+
+        const svcDeps = (depOf[tool.id]||[]).map(id => nodeById[id])
+          .filter(n => n?.type === 'service');
+
+        for (const svc of svcDeps) {
+          const sInst = `${svc.id}::${tInst}`;
+          addNode(svc, sInst, d);
+          dEdges.push({ from: tInst, to: sInst });
+        }
+      }
+
+      // Services the automation depends on directly (no tool intermediary)
+      for (const svc of directSvcDeps) {
+        const sInst = `${svc.id}::${auto.id}::d`;
+        addNode(svc, sInst, d);
+        dEdges.push({ from: auto.id, to: sInst });
+      }
+    }
+
+    // Orphan tools: tools in this domain not referenced by any automation above
+    for (const tool of tools) {
+      if (claimedToolIds.has(tool.id)) continue;
+      const tInst = `${tool.id}::orphan`;
+      addNode(tool, tInst, d);
+
+      const svcDeps = (depOf[tool.id]||[]).map(id => nodeById[id])
+        .filter(n => n?.type === 'service');
+
+      for (const svc of svcDeps) {
+        const sInst = `${svc.id}::${tInst}`;
+        addNode(svc, sInst, d);
+        dEdges.push({ from: tInst, to: sInst });
+      }
+    }
+  }
+
+  return { dNodes, dEdges };
+}
+
+// ── Per-domain pixel-based tree layout ────────────────────────
+// Returns positions keyed by display ID, relative to domain band origin (y=0).
+function layoutDomainPx(domNodes, xOff, depOf) {
+  const pos = {};
+  let py = 0;
+
+  const autos     = domNodes.filter(n => ['trigger_task','workflow'].includes(n.type));
+  const orphTools = domNodes.filter(n => ['tool','api_bridge'].includes(n.type) && n.id.endsWith('::orphan'));
+
+  // Place a tool + its service children; advance py; center tool over its service block
+  function placeToolBlock(toolNode) {
+    const startY = py;
+    const svcKids = (depOf[toolNode.id]||[])
+      .map(id => domNodes.find(n => n.id === id))
+      .filter(n => n?.type === 'service');
+
+    if (svcKids.length === 0) {
+      pos[toolNode.id] = { x: xOff + COL_TOOL_X, y: py + (ROW_H - NODE_H) / 2 };
+      py += ROW_H;
+    } else {
+      svcKids.forEach(s => {
+        pos[s.id] = { x: xOff + COL_SVC_X, y: py + (ROW_H - NODE_H) / 2 };
+        py += ROW_H;
+      });
+      const blockH = py - startY;
+      pos[toolNode.id] = { x: xOff + COL_TOOL_X, y: startY + (blockH - NODE_H) / 2 };
+    }
+  }
+
+  for (let ai = 0; ai < autos.length; ai++) {
+    const auto = autos[ai];
+    const autoStartY = py;
+
+    const toolKids = (depOf[auto.id]||[])
+      .map(id => domNodes.find(n => n.id === id))
+      .filter(n => n && ['tool','api_bridge'].includes(n.type));
+
+    const directSvcKids = (depOf[auto.id]||[])
+      .map(id => domNodes.find(n => n.id === id))
+      .filter(n => n?.type === 'service');
+
+    toolKids.forEach(t => placeToolBlock(t));
+    directSvcKids.forEach(s => {
+      pos[s.id] = { x: xOff + COL_SVC_X, y: py + (ROW_H - NODE_H) / 2 };
+      py += ROW_H;
+    });
+
+    const autoH = py - autoStartY;
+    if (autoH === 0) {
+      // Auto with no children: single row
+      pos[auto.id] = { x: xOff + COL_TASK_X, y: py + (ROW_H - NODE_H) / 2 };
+      py += ROW_H;
+    } else {
+      pos[auto.id] = { x: xOff + COL_TASK_X, y: autoStartY + (autoH - NODE_H) / 2 };
+    }
+
+    if (ai < autos.length - 1) py += AUTO_GAP;
+  }
+
+  // Orphan tools placed after all automation groups
+  if (autos.length > 0 && orphTools.length > 0) py += AUTO_GAP;
+  orphTools.forEach(t => placeToolBlock(t));
+
+  return { pos, totalPx: py };
+}
+
+// ── Main layout: 2-column domain grid ────────────────────────
+function computeLayout(dNodes, dEdges) {
+  const depOf = {};
+  for (const e of dEdges) (depOf[e.from] = depOf[e.from]||[]).push(e.to);
+
+  const byDomain = {};
+  for (const d of DOMAIN_ORDER) byDomain[d] = [];
+  for (const n of dNodes) {
+    if (n.domain && byDomain[n.domain]) byDomain[n.domain].push(n);
   }
 
   const pos = {}, bands = [];
   let cy = PAD_TOP;
 
-  // Pass 1: place tasks + tools, record band positions
   for (const [leftD, rightD] of DOMAIN_PAIRS) {
-    const leftRows  = Math.max(byDomain[leftD].tasks.length,  byDomain[leftD].tools.length,  1);
-    const rightRows = Math.max(byDomain[rightD].tasks.length, byDomain[rightD].tools.length, 1);
-    const rows = Math.max(leftRows, rightRows);
-    const bandH = LANE_TOP + rows * ROW_H + LANE_BOT;
+    const lRes = layoutDomainPx(byDomain[leftD]  || [], 0,          depOf);
+    const rRes = layoutDomainPx(byDomain[rightD] || [], COL_OFFSET, depOf);
+    const maxPx = Math.max(lRes.totalPx, rRes.totalPx, ROW_H);
+    const bandH = LANE_TOP + maxPx + LANE_BOT;
 
-    for (const [d, xOff] of [[leftD, 0], [rightD, COL_OFFSET]]) {
-      const { tasks, tools } = byDomain[d];
-      const taskOff = Math.max(0, (rows - tasks.length) / 2 * ROW_H);
-      const toolOff = Math.max(0, (rows - tools.length) / 2 * ROW_H);
+    for (const [id, p] of Object.entries(lRes.pos)) pos[id] = { x: p.x, y: cy + LANE_TOP + p.y };
+    for (const [id, p] of Object.entries(rRes.pos)) pos[id] = { x: p.x, y: cy + LANE_TOP + p.y };
 
-      tasks.forEach((n,i) => pos[n.id] = { x: xOff + COL_TASK_X, y: cy + LANE_TOP + taskOff + i * ROW_H });
-      tools.forEach((n,i) => pos[n.id] = { x: xOff + COL_TOOL_X, y: cy + LANE_TOP + toolOff + i * ROW_H });
-      bands.push({ domain:d, y:cy, h:bandH, xOff });
-    }
-
+    bands.push({ domain:leftD,  y:cy, h:bandH, xOff:0 });
+    bands.push({ domain:rightD, y:cy, h:bandH, xOff:COL_OFFSET });
     cy += bandH + LANE_GAP;
   }
 
-  // Pass 2: assign each service to the domain whose tools/tasks first reference it
-  const svcPrimary = {}; // svcId -> domain
-  for (const d of DOMAIN_ORDER) {
-    const domainIds = new Set([
-      ...byDomain[d].tasks.map(n => n.id),
-      ...byDomain[d].tools.map(n => n.id),
-    ]);
-    for (const nid of domainIds) {
-      for (const depId of (depOf[nid]||[])) {
-        if (!svcPrimary[depId] && nodeById[depId]?.type === 'service') {
-          svcPrimary[depId] = d;
-        }
-      }
-    }
-  }
-
-  // Pass 3: place each service aligned to the Y of its primary tool
-  const svcByDomain = {};
-  const unassigned = [];
-  for (const svc of services) {
-    const d = svcPrimary[svc.id];
-    if (d) (svcByDomain[d] = svcByDomain[d]||[]).push(svc);
-    else unassigned.push(svc);
-  }
-
-  for (const band of bands) {
-    const svcs = svcByDomain[band.domain];
-    if (!svcs?.length) continue;
-
-    // For each service, find the Y of the first tool (sorted by Y) that depends on it
-    const toolsByY = [...byDomain[band.domain].tools]
-      .filter(t => pos[t.id])
-      .sort((a,b) => pos[a.id].y - pos[b.id].y);
-
-    const svcTargetY = {};
-    for (const tool of toolsByY) {
-      for (const depId of (depOf[tool.id]||[])) {
-        if (!svcTargetY[depId] && svcs.some(s => s.id === depId)) {
-          svcTargetY[depId] = pos[tool.id].y;
-        }
-      }
-    }
-
-    // Sort services by their target Y, then stack if two share the same slot
-    const sorted = [...svcs].sort(
-      (a,b) => (svcTargetY[a.id] ?? (band.y + LANE_TOP)) - (svcTargetY[b.id] ?? (band.y + LANE_TOP))
-    );
-    const usedY = new Set();
-    for (const svc of sorted) {
-      let y = svcTargetY[svc.id] ?? (band.y + LANE_TOP);
-      while (usedY.has(y)) y += ROW_H;
-      usedY.add(y);
-      pos[svc.id] = { x: band.xOff + COL_SVC_X, y };
-    }
-  }
-
-  // Any services still unpositioned go at the far right below all bands
-  let extra = cy + 10;
-  for (const svc of [...services, ...unassigned]) {
-    if (!pos[svc.id]) { pos[svc.id] = { x: COL_OFFSET + COL_SVC_X, y: extra }; extra += ROW_H; }
-  }
-
-  const totalH = Math.max(extra, cy) + 20;
-  return { pos, bands, totalH };
+  return { pos, bands, totalH: cy + 20 };
 }
 
 // ── Render swimlanes + column headers ────────────────────────
@@ -506,10 +578,11 @@ function renderNodes(nodes, pos) {
 
     const card = document.createElement('div');
     card.className = 'node-card';
-    card.dataset.id     = n.id;
-    card.dataset.domain = n.domain;
-    card.dataset.status = n.status;
-    card.dataset.type   = n.type;
+    card.dataset.id         = n.id;
+    card.dataset.originalId = n.originalId || n.id;
+    card.dataset.domain     = n.domain;
+    card.dataset.status     = n.status;
+    card.dataset.type       = n.type;
     card.style.cssText  = `left:${p.x}px;top:${p.y}px;width:${NODE_W}px;height:${NODE_H}px;border-left-color:${sc};`;
 
     card.innerHTML = `
@@ -529,7 +602,7 @@ function renderNodes(nodes, pos) {
 }
 
 // ── Render SVG edges ──────────────────────────────────────────
-function renderEdges(edges, pos) {
+function renderEdges(edges, pos, dNodes) {
   const svg = $('edges-svg');
   svg.innerHTML = `
     <defs>
@@ -538,13 +611,9 @@ function renderEdges(edges, pos) {
       </marker>
     </defs>`;
 
-  const TYPE_COL = {
-    trigger_task:2, workflow:2,
-    api_bridge:3, tool:3,
-    service:4,
-  };
+  const TYPE_COL = { trigger_task:2, workflow:2, api_bridge:3, tool:3, service:4 };
   const nodeType = {};
-  for (const n of allNodes) nodeType[n.id] = n.type;
+  for (const n of dNodes) nodeType[n.id] = n.type;
 
   const drawn = new Set();
 
@@ -674,16 +743,13 @@ function applyFilters() {
   const { domain, status } = activeFilter;
   const searchQ = $('search').value.toLowerCase().trim();
 
-  let any = false;
   for (const card of $('node-layer').querySelectorAll('.node-card')) {
-    const dm = card.dataset.domain, st = card.dataset.status, id = card.dataset.id;
-    const n = nodeById[id];
+    const dm = card.dataset.domain, st = card.dataset.status;
+    const n  = nodeById[card.dataset.originalId] || {};
     const domainOk  = domain === 'all' || dm === domain;
     const statusOk  = status === 'all' || st === status;
-    const searchOk  = !searchQ || (n.label.toLowerCase().includes(searchQ) || (n.description||'').toLowerCase().includes(searchQ));
-    const show = domainOk && statusOk && searchOk;
-    card.classList.toggle('dimmed', !show);
-    if (show) any = true;
+    const searchOk  = !searchQ || (n.label||'').toLowerCase().includes(searchQ) || (n.description||'').toLowerCase().includes(searchQ);
+    card.classList.toggle('dimmed', !(domainOk && statusOk && searchOk));
   }
 
   // Dim edges if either endpoint is dimmed
@@ -768,7 +834,7 @@ function getCountdown(schedule) {
 }
 
 // ── Stats bar ──────────────────────────────────────────────────
-function updateStats(meta, nodes) {
+function updateStats(meta) {
   $('st-nodes').textContent = `${meta.node_count||0} nodes`;
   $('st-edges').textContent = `${meta.edge_count||0} edges`;
   const sc = meta.status_counts || {};
@@ -798,26 +864,28 @@ async function init() {
   allNodes = data.nodes;
   for (const n of allNodes) nodeById[n.id] = n;
 
-  updateStats(data.meta || {}, allNodes);
+  updateStats(data.meta || {});
 
-  const { pos, bands, totalH } = computeLayout(allNodes, data.edges || []);
-  positions = pos;
+  const { dNodes, dEdges } = buildDisplayGraph(allNodes, data.edges || []);
+  dispNodes = dNodes;
+  dispEdges = dEdges;
+
+  const { pos, bands, totalH } = computeLayout(dispNodes, dispEdges);
 
   $('canvas').style.width  = CANVAS_W + 'px';
-  $('canvas').style.height = totalH + 'px';
+  $('canvas').style.height = totalH   + 'px';
   $('edges-svg').setAttribute('width',  CANVAS_W);
   $('edges-svg').setAttribute('height', totalH);
 
   renderBackground(bands, totalH);
-  renderNodes(allNodes, pos);
-  renderEdges(data.edges || [], pos);
+  renderNodes(dispNodes, pos);
+  renderEdges(dispEdges, pos, dispNodes);
 
   setupPanZoom(totalH);
   setupFilters();
 
-  // Initial view: fit full width so both columns are visible
-  const vw = $('viewport').offsetWidth, vh = $('viewport').offsetHeight;
-  zoom = Math.min((vw - 48) / CANVAS_W, 0.85);
+  const vw = $('viewport').offsetWidth;
+  zoom = Math.min((vw - 48) / CANVAS_W, 0.82);
   pan.x = Math.max(12, (vw - CANVAS_W * zoom) / 2);
   pan.y = 18;
   applyTransform();
