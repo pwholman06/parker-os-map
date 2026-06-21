@@ -296,10 +296,16 @@ const DOMAIN_COLOR = {
 const DOMAIN_ICON  = { investing:'📈', social:'📱', espresso_yourself:'☕', finance:'💰', infrastructure:'⚙️', comms:'✉️' };
 const DOMAIN_LABEL = { investing:'Investing', social:'Social / Brand', espresso_yourself:'Espresso Yourself', finance:'Finance', infrastructure:'Infrastructure', comms:'Comms' };
 const DOMAIN_ORDER = ['investing','social','espresso_yourself','finance','infrastructure','comms'];
+// Two domains side-by-side per row: [left, right]
+const DOMAIN_PAIRS = [
+  ['investing',      'social'],
+  ['finance',        'espresso_yourself'],
+  ['infrastructure', 'comms'],
+];
 
 // Layout
 const NODE_W = 190, NODE_H = 52, ROW_H = 64;
-const LANE_TOP = 38, LANE_BOT = 18, LANE_GAP = 10;
+const LANE_TOP = 38, LANE_BOT = 18, LANE_GAP = 14;
 const PAD_X = 22, PAD_TOP = 52;
 
 const COL_LABEL_W = 142, COL_GAP = 16;
@@ -307,7 +313,9 @@ const COL_LABEL_X = PAD_X;
 const COL_TASK_X  = COL_LABEL_X + COL_LABEL_W + COL_GAP;
 const COL_TOOL_X  = COL_TASK_X  + NODE_W + COL_GAP;
 const COL_SVC_X   = COL_TOOL_X  + NODE_W + 40;
-const CANVAS_W    = COL_SVC_X   + NODE_W + PAD_X;
+const HALF_W      = COL_SVC_X   + NODE_W + PAD_X;   // width of one column
+const COL_OFFSET  = HALF_W + 24;                      // x-start of right column
+const CANVAS_W    = COL_OFFSET   + HALF_W;
 
 // ── State ──────────────────────────────────────────────────────
 let pan = { x: 24, y: 24 }, zoom = 0.82;
@@ -319,7 +327,7 @@ let allNodes = [], nodeById = {}, positions = {};
 const hex2rgba = (h,a) => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return `rgba(${r},${g},${b},${a})`; };
 const $ = id => document.getElementById(id);
 
-// ── Layout computation ────────────────────────────────────────
+// ── Layout computation (2-column grid) ───────────────────────
 function computeLayout(nodes) {
   const byDomain = {};
   const services = [];
@@ -334,51 +342,56 @@ function computeLayout(nodes) {
     else if (['tool','api_bridge'].includes(n.type))  byDomain[d].tools.push(n);
   }
 
-  const pos = {}, bands = [];
-  let cy = PAD_TOP;
-
-  for (const d of DOMAIN_ORDER) {
-    const { tasks, tools } = byDomain[d];
-    const rows = Math.max(tasks.length, tools.length, 1);
-    const bandH = LANE_TOP + rows * ROW_H + LANE_BOT;
-
-    bands.push({ domain:d, y:cy, h:bandH, rows });
-
-    const taskOff = Math.max(0, (rows - tasks.length) / 2 * ROW_H);
-    const toolOff = Math.max(0, (rows - tools.length) / 2 * ROW_H);
-
-    tasks.forEach((n,i) => pos[n.id] = { x:COL_TASK_X, y:cy + LANE_TOP + taskOff + i * ROW_H });
-    tools.forEach((n,i) => pos[n.id] = { x:COL_TOOL_X, y:cy + LANE_TOP + toolOff + i * ROW_H });
-
-    cy += bandH + LANE_GAP;
-  }
-
-  // Services: assign primary domain by first-referencing node
+  // Assign services to primary domain (first node that depends on them)
   const svcPrimary = {};
   for (const d of DOMAIN_ORDER) {
-    const all = [...byDomain[d].tasks, ...byDomain[d].tools];
-    for (const n of all)
+    for (const n of [...byDomain[d].tasks, ...byDomain[d].tools])
       for (const dep of (n.depends_on||[]))
         if (!svcPrimary[dep]) svcPrimary[dep] = d;
   }
 
+  const pos = {}, bands = [];
+  let cy = PAD_TOP;
+
+  for (const [leftD, rightD] of DOMAIN_PAIRS) {
+    const leftRows  = Math.max(byDomain[leftD].tasks.length,  byDomain[leftD].tools.length,  1);
+    const rightRows = Math.max(byDomain[rightD].tasks.length, byDomain[rightD].tools.length, 1);
+    const rows = Math.max(leftRows, rightRows);
+    const bandH = LANE_TOP + rows * ROW_H + LANE_BOT;
+
+    for (const [d, xOff] of [[leftD, 0], [rightD, COL_OFFSET]]) {
+      const { tasks, tools } = byDomain[d];
+      const dRows = Math.max(tasks.length, tools.length, 1);
+      const taskOff = Math.max(0, (rows - tasks.length) / 2 * ROW_H);
+      const toolOff = Math.max(0, (rows - tools.length) / 2 * ROW_H);
+
+      tasks.forEach((n,i) => pos[n.id] = { x: xOff + COL_TASK_X, y: cy + LANE_TOP + taskOff + i * ROW_H });
+      tools.forEach((n,i) => pos[n.id] = { x: xOff + COL_TOOL_X, y: cy + LANE_TOP + toolOff + i * ROW_H });
+      bands.push({ domain:d, y:cy, h:bandH, xOff });
+    }
+
+    cy += bandH + LANE_GAP;
+  }
+
+  // Place services within their domain band's services column
   const svcByDomain = {};
   const svcUnassigned = [];
   for (const svc of services) {
     const d = svcPrimary[svc.id];
-    if (d) { (svcByDomain[d] = svcByDomain[d]||[]).push(svc); }
+    if (d) (svcByDomain[d] = svcByDomain[d]||[]).push(svc);
     else svcUnassigned.push(svc);
   }
 
   for (const band of bands) {
     const svcs = svcByDomain[band.domain] || [];
-    svcs.forEach((svc,i) => pos[svc.id] = { x:COL_SVC_X, y: band.y + LANE_TOP + i * ROW_H });
+    svcs.forEach((svc,i) => pos[svc.id] = { x: band.xOff + COL_SVC_X, y: band.y + LANE_TOP + i * ROW_H });
   }
 
+  // Unassigned services go below last row in right column
   let extra = cy + 10;
-  for (const svc of svcUnassigned) { pos[svc.id] = { x:COL_SVC_X, y:extra }; extra += ROW_H; }
+  for (const svc of svcUnassigned) { pos[svc.id] = { x: COL_OFFSET + COL_SVC_X, y: extra }; extra += ROW_H; }
 
-  const totalH = Math.max(extra, cy) + PAD_TOP;
+  const totalH = Math.max(extra, cy) + 20;
   return { pos, bands, totalH };
 }
 
@@ -387,26 +400,26 @@ function renderBackground(bands, totalH) {
   const bg = $('bg-layer');
   bg.innerHTML = '';
 
-  // Column headers (inside canvas, rendered once)
-  const hdrs = [
-    { label:'Automations', x:COL_TASK_X },
-    { label:'Tools',       x:COL_TOOL_X },
-    { label:'Services',    x:COL_SVC_X  },
-  ];
-  for (const h of hdrs) {
-    const el = document.createElement('div');
-    el.className = 'col-hdr';
-    el.style.cssText = `left:${h.x}px;top:${PAD_TOP-26}px;width:${NODE_W}px;text-align:left`;
-    el.textContent = h.label;
-    bg.appendChild(el);
-  }
+  // Column headers for both left and right columns
+  for (const xOff of [0, COL_OFFSET]) {
+    for (const { label, x } of [
+      { label:'Automations', x: xOff + COL_TASK_X },
+      { label:'Tools',       x: xOff + COL_TOOL_X },
+      { label:'Services',    x: xOff + COL_SVC_X  },
+    ]) {
+      const el = document.createElement('div');
+      el.className = 'col-hdr';
+      el.style.cssText = `left:${x}px;top:${PAD_TOP-26}px;width:${NODE_W}px`;
+      el.textContent = label;
+      bg.appendChild(el);
+    }
 
-  // Services panel
-  const sp = document.createElement('div');
-  sp.className = 'svc-panel';
-  sp.style.cssText = `left:${COL_SVC_X-10}px;top:${PAD_TOP-10}px;width:${NODE_W+20}px;height:${totalH - PAD_TOP + 10}px`;
-  sp.innerHTML = '';
-  bg.appendChild(sp);
+    // Services panel per column
+    const sp = document.createElement('div');
+    sp.className = 'svc-panel';
+    sp.style.cssText = `left:${xOff+COL_SVC_X-10}px;top:${PAD_TOP-10}px;width:${NODE_W+20}px;height:${totalH-PAD_TOP+10}px`;
+    bg.appendChild(sp);
+  }
 
   // Swimlane bands
   for (const band of bands) {
@@ -414,14 +427,15 @@ function renderBackground(bands, totalH) {
     const el = document.createElement('div');
     el.className = 'swimlane';
     el.dataset.domain = band.domain;
-    el.style.cssText = `left:${COL_LABEL_X}px;top:${band.y}px;width:${COL_SVC_X - COL_LABEL_X - 24}px;height:${band.h}px`;
+    const bandLeft  = band.xOff + COL_LABEL_X;
+    const bandWidth = COL_SVC_X - COL_LABEL_X + NODE_W + 8;
+    el.style.cssText = `left:${bandLeft}px;top:${band.y}px;width:${bandWidth}px;height:${band.h}px`;
     el.style.background = hex2rgba(dc, 0.035);
     el.style.borderColor = hex2rgba(dc, 0.15);
 
-    // Health ratio
-    const domNodes = allNodes.filter(n => n.domain === band.domain && n.type !== 'domain');
+    const domNodes  = allNodes.filter(n => n.domain === band.domain && n.type !== 'domain');
     const autoCount = domNodes.filter(n => n.status==='autonomous').length;
-    const health = domNodes.length ? `${autoCount}/${domNodes.length} auto` : '';
+    const health    = domNodes.length ? `${autoCount}/${domNodes.length} auto` : '';
 
     el.innerHTML = `
       <div class="swimlane-header">
@@ -761,13 +775,11 @@ async function init() {
   setupPanZoom(totalH);
   setupFilters();
 
-  // Initial fit
+  // Initial view: fit full width so both columns are visible
   const vw = $('viewport').offsetWidth, vh = $('viewport').offsetHeight;
-  const scaleX = (vw - 48) / CANVAS_W;
-  const scaleH = (vh - 48) / totalH;
-  zoom = Math.min(scaleX, 0.88);
-  pan.x = Math.max(24, (vw - CANVAS_W * zoom) / 2);
-  pan.y = 24;
+  zoom = Math.min((vw - 48) / CANVAS_W, 0.85);
+  pan.x = Math.max(12, (vw - CANVAS_W * zoom) / 2);
+  pan.y = 18;
   applyTransform();
 }
 
