@@ -112,7 +112,7 @@
       "icon_type": "emoji",
       "icon_value": "\u2699\ufe0f",
       "icon_url": null,
-      "sub_label": "11/24 autonomous",
+      "sub_label": "12/27 autonomous",
       "x": -160,
       "y": 200,
       "fixed": {
@@ -433,6 +433,27 @@
       "icon_type": "initials",
       "icon_value": "TR",
       "icon_url": null,
+      "sub_label": "",
+      "x": -160,
+      "y": 200,
+      "fixed": false
+    },
+    {
+      "id": "svc_github",
+      "label": "GitHub Pages",
+      "type": "service",
+      "domain": "infrastructure",
+      "status": "autonomous",
+      "description": "GitHub Pages hosting for the Parker OS system map. Deployed via GitHub Contents API.",
+      "schedule": null,
+      "file_path": null,
+      "github_url": null,
+      "notes": null,
+      "border_color": "#22c55e",
+      "size": 24,
+      "icon_type": "simpleicons",
+      "icon_value": "github",
+      "icon_url": "https://cdn.simpleicons.org/github/ffffff",
       "sub_label": "",
       "x": -160,
       "y": 200,
@@ -940,6 +961,27 @@
       "sub_label": "",
       "x": 560,
       "y": 80,
+      "fixed": false
+    },
+    {
+      "id": "task_system_map_update",
+      "label": "Map Status Sync",
+      "type": "trigger_task",
+      "domain": "infrastructure",
+      "status": "needs_testing",
+      "description": "Cron at 5:30 AM + 5:30 PM ET. Queries Trigger.dev run history, computes live statuses, pushes runtime_status.json to GitHub Pages so the map reflects actual execution state.",
+      "schedule": "5:30 AM / 5:30 PM ET daily",
+      "file_path": null,
+      "github_url": null,
+      "notes": null,
+      "border_color": "#eab308",
+      "size": 30,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\uddfa\ufe0f",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -160,
+      "y": 200,
       "fixed": false
     },
     {
@@ -2075,6 +2117,27 @@
       "x": -160,
       "y": 200,
       "fixed": false
+    },
+    {
+      "id": "tool_system_map_update",
+      "label": "Map Status Updater",
+      "type": "tool",
+      "domain": "infrastructure",
+      "status": "needs_testing",
+      "description": "Queries Trigger.dev API for actual run history, computes live statuses, writes runtime_status.json to GitHub Pages. On-demand companion to the scheduled Trigger.dev task.",
+      "schedule": null,
+      "file_path": "tools/system_map/update_map_status.py",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/tools/system_map/update_map_status.py",
+      "notes": null,
+      "border_color": "#eab308",
+      "size": 18,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\uddfa\ufe0f",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -160,
+      "y": 200,
+      "fixed": false
     }
   ],
   "edges": [
@@ -2293,6 +2356,18 @@
     {
       "from": "task_square_weekly",
       "to": "svc_notion"
+    },
+    {
+      "from": "task_system_map_update",
+      "to": "tool_system_map_update"
+    },
+    {
+      "from": "task_system_map_update",
+      "to": "svc_github"
+    },
+    {
+      "from": "task_system_map_update",
+      "to": "svc_trigger"
     },
     {
       "from": "content_analyzer",
@@ -2561,21 +2636,29 @@
     {
       "from": "opportunity_research",
       "to": "svc_notion"
+    },
+    {
+      "from": "tool_system_map_update",
+      "to": "svc_github"
+    },
+    {
+      "from": "tool_system_map_update",
+      "to": "svc_trigger"
     }
   ],
   "meta": {
-    "generated_at": "2026-06-21T15:45:06.849477+00:00",
-    "node_count": 98,
-    "edge_count": 121,
+    "generated_at": "2026-06-21T19:38:39.775919+00:00",
+    "node_count": 101,
+    "edge_count": 126,
     "status_counts": {
       "tested": 60,
-      "autonomous": 19,
-      "needs_testing": 19
+      "autonomous": 20,
+      "needs_testing": 21
     },
     "domain_health": {
       "infrastructure": {
-        "autonomous": 11,
-        "total": 24
+        "autonomous": 12,
+        "total": 27
       },
       "social": {
         "autonomous": 0,
