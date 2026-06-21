@@ -328,7 +328,11 @@ const hex2rgba = (h,a) => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice
 const $ = id => document.getElementById(id);
 
 // ── Layout computation (2-column grid) ───────────────────────
-function computeLayout(nodes) {
+function computeLayout(nodes, edges) {
+  // Build dependency map from edges (nodes in map.json don't carry depends_on)
+  const depOf = {}; // nodeId -> [ids it points to]
+  for (const e of edges) (depOf[e.from] = depOf[e.from]||[]).push(e.to);
+
   const byDomain = {};
   const services = [];
   for (const d of DOMAIN_ORDER) byDomain[d] = { tasks:[], tools:[] };
@@ -342,17 +346,10 @@ function computeLayout(nodes) {
     else if (['tool','api_bridge'].includes(n.type))  byDomain[d].tools.push(n);
   }
 
-  // Assign services to primary domain (first node that depends on them)
-  const svcPrimary = {};
-  for (const d of DOMAIN_ORDER) {
-    for (const n of [...byDomain[d].tasks, ...byDomain[d].tools])
-      for (const dep of (n.depends_on||[]))
-        if (!svcPrimary[dep]) svcPrimary[dep] = d;
-  }
-
   const pos = {}, bands = [];
   let cy = PAD_TOP;
 
+  // Pass 1: place tasks + tools, record band positions
   for (const [leftD, rightD] of DOMAIN_PAIRS) {
     const leftRows  = Math.max(byDomain[leftD].tasks.length,  byDomain[leftD].tools.length,  1);
     const rightRows = Math.max(byDomain[rightD].tasks.length, byDomain[rightD].tools.length, 1);
@@ -361,7 +358,6 @@ function computeLayout(nodes) {
 
     for (const [d, xOff] of [[leftD, 0], [rightD, COL_OFFSET]]) {
       const { tasks, tools } = byDomain[d];
-      const dRows = Math.max(tasks.length, tools.length, 1);
       const taskOff = Math.max(0, (rows - tasks.length) / 2 * ROW_H);
       const toolOff = Math.max(0, (rows - tools.length) / 2 * ROW_H);
 
@@ -373,23 +369,67 @@ function computeLayout(nodes) {
     cy += bandH + LANE_GAP;
   }
 
-  // Place services within their domain band's services column
+  // Pass 2: assign each service to the domain whose tools/tasks first reference it
+  const svcPrimary = {}; // svcId -> domain
+  for (const d of DOMAIN_ORDER) {
+    const domainIds = new Set([
+      ...byDomain[d].tasks.map(n => n.id),
+      ...byDomain[d].tools.map(n => n.id),
+    ]);
+    for (const nid of domainIds) {
+      for (const depId of (depOf[nid]||[])) {
+        if (!svcPrimary[depId] && nodeById[depId]?.type === 'service') {
+          svcPrimary[depId] = d;
+        }
+      }
+    }
+  }
+
+  // Pass 3: place each service aligned to the Y of its primary tool
   const svcByDomain = {};
-  const svcUnassigned = [];
+  const unassigned = [];
   for (const svc of services) {
     const d = svcPrimary[svc.id];
     if (d) (svcByDomain[d] = svcByDomain[d]||[]).push(svc);
-    else svcUnassigned.push(svc);
+    else unassigned.push(svc);
   }
 
   for (const band of bands) {
-    const svcs = svcByDomain[band.domain] || [];
-    svcs.forEach((svc,i) => pos[svc.id] = { x: band.xOff + COL_SVC_X, y: band.y + LANE_TOP + i * ROW_H });
+    const svcs = svcByDomain[band.domain];
+    if (!svcs?.length) continue;
+
+    // For each service, find the Y of the first tool (sorted by Y) that depends on it
+    const toolsByY = [...byDomain[band.domain].tools]
+      .filter(t => pos[t.id])
+      .sort((a,b) => pos[a.id].y - pos[b.id].y);
+
+    const svcTargetY = {};
+    for (const tool of toolsByY) {
+      for (const depId of (depOf[tool.id]||[])) {
+        if (!svcTargetY[depId] && svcs.some(s => s.id === depId)) {
+          svcTargetY[depId] = pos[tool.id].y;
+        }
+      }
+    }
+
+    // Sort services by their target Y, then stack if two share the same slot
+    const sorted = [...svcs].sort(
+      (a,b) => (svcTargetY[a.id] ?? (band.y + LANE_TOP)) - (svcTargetY[b.id] ?? (band.y + LANE_TOP))
+    );
+    const usedY = new Set();
+    for (const svc of sorted) {
+      let y = svcTargetY[svc.id] ?? (band.y + LANE_TOP);
+      while (usedY.has(y)) y += ROW_H;
+      usedY.add(y);
+      pos[svc.id] = { x: band.xOff + COL_SVC_X, y };
+    }
   }
 
-  // Unassigned services go below last row in right column
+  // Any services still unpositioned go at the far right below all bands
   let extra = cy + 10;
-  for (const svc of svcUnassigned) { pos[svc.id] = { x: COL_OFFSET + COL_SVC_X, y: extra }; extra += ROW_H; }
+  for (const svc of [...services, ...unassigned]) {
+    if (!pos[svc.id]) { pos[svc.id] = { x: COL_OFFSET + COL_SVC_X, y: extra }; extra += ROW_H; }
+  }
 
   const totalH = Math.max(extra, cy) + 20;
   return { pos, bands, totalH };
@@ -760,7 +800,7 @@ async function init() {
 
   updateStats(data.meta || {}, allNodes);
 
-  const { pos, bands, totalH } = computeLayout(allNodes);
+  const { pos, bands, totalH } = computeLayout(allNodes, data.edges || []);
   positions = pos;
 
   $('canvas').style.width  = CANVAS_W + 'px';
