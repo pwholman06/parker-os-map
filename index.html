@@ -296,16 +296,14 @@ const DOMAIN_COLOR = {
 const DOMAIN_ICON  = { investing:'📈', social:'📱', espresso_yourself:'☕', finance:'💰', infrastructure:'⚙️', comms:'✉️' };
 const DOMAIN_LABEL = { investing:'Investing', social:'Social / Brand', espresso_yourself:'Espresso Yourself', finance:'Finance', infrastructure:'Infrastructure', comms:'Comms' };
 const DOMAIN_ORDER = ['investing','social','espresso_yourself','finance','infrastructure','comms'];
-const DOMAIN_PAIRS = [
-  ['investing',      'social'],
-  ['finance',        'espresso_yourself'],
-  ['infrastructure', 'comms'],
-];
+// Horizontal display order (left → right) by importance
+const DOMAIN_ORDER_DISPLAY = ['infrastructure','comms','social','espresso_yourself','investing','finance'];
 
 // Layout — tree mode: auto → tools → services, each branch self-contained
 const NODE_W = 182, NODE_H = 48, ROW_H = 60;
 const AUTO_GAP = 12;   // px gap between automation groups in a domain
-const LANE_TOP = 40, LANE_BOT = 22, LANE_GAP = 14;
+const DOMAIN_COL_GAP = 18; // horizontal gap between domain swimlanes
+const LANE_TOP = 40, LANE_BOT = 22;
 const PAD_X = 20, PAD_TOP = 52;
 
 const COL_LABEL_W = 118, COL_GAP = 14;
@@ -314,8 +312,8 @@ const COL_TASK_X  = COL_LABEL_X + COL_LABEL_W + COL_GAP;  // 152
 const COL_TOOL_X  = COL_TASK_X  + NODE_W + COL_GAP;        // 348
 const COL_SVC_X   = COL_TOOL_X  + NODE_W + COL_GAP;        // 544
 const HALF_W      = COL_SVC_X   + NODE_W + PAD_X;          // 746
-const COL_OFFSET  = HALF_W + 22;                            // 768
-const CANVAS_W    = COL_OFFSET   + HALF_W;                  // 1514
+// Total canvas width: all domain columns side-by-side with gaps
+const CANVAS_W    = DOMAIN_ORDER_DISPLAY.length * HALF_W + (DOMAIN_ORDER_DISPLAY.length - 1) * DOMAIN_COL_GAP;
 
 // ── State ──────────────────────────────────────────────────────
 let pan = { x: 24, y: 24 }, zoom = 0.8;
@@ -476,7 +474,7 @@ function layoutDomainPx(domNodes, xOff, depOf) {
   return { pos, totalPx: py };
 }
 
-// ── Main layout: 2-column domain grid ────────────────────────
+// ── Main layout: single horizontal strip of domain columns ────
 function computeLayout(dNodes, dEdges) {
   const depOf = {};
   for (const e of dEdges) (depOf[e.from] = depOf[e.from]||[]).push(e.to);
@@ -487,24 +485,29 @@ function computeLayout(dNodes, dEdges) {
     if (n.domain && byDomain[n.domain]) byDomain[n.domain].push(n);
   }
 
-  const pos = {}, bands = [];
-  let cy = PAD_TOP;
-
-  for (const [leftD, rightD] of DOMAIN_PAIRS) {
-    const lRes = layoutDomainPx(byDomain[leftD]  || [], 0,          depOf);
-    const rRes = layoutDomainPx(byDomain[rightD] || [], COL_OFFSET, depOf);
-    const maxPx = Math.max(lRes.totalPx, rRes.totalPx, ROW_H);
-    const bandH = LANE_TOP + maxPx + LANE_BOT;
-
-    for (const [id, p] of Object.entries(lRes.pos)) pos[id] = { x: p.x, y: cy + LANE_TOP + p.y };
-    for (const [id, p] of Object.entries(rRes.pos)) pos[id] = { x: p.x, y: cy + LANE_TOP + p.y };
-
-    bands.push({ domain:leftD,  y:cy, h:bandH, xOff:0 });
-    bands.push({ domain:rightD, y:cy, h:bandH, xOff:COL_OFFSET });
-    cy += bandH + LANE_GAP;
+  // Lay out each domain column; track the x offset as we move right
+  const domainResults = {};
+  let cx = 0;
+  for (const d of DOMAIN_ORDER_DISPLAY) {
+    domainResults[d] = { res: layoutDomainPx(byDomain[d] || [], cx, depOf), xOff: cx };
+    cx += HALF_W + DOMAIN_COL_GAP;
   }
 
-  return { pos, bands, totalH: cy + 20 };
+  // All domains share the same band height (tallest domain wins)
+  const maxPx = Math.max(...Object.values(domainResults).map(dl => dl.res.totalPx), ROW_H);
+  const bandH = LANE_TOP + maxPx + LANE_BOT;
+
+  const pos = {}, bands = [];
+  for (const d of DOMAIN_ORDER_DISPLAY) {
+    const { res, xOff } = domainResults[d];
+    for (const [id, p] of Object.entries(res.pos)) {
+      pos[id] = { x: p.x, y: PAD_TOP + LANE_TOP + p.y };
+    }
+    bands.push({ domain:d, y:PAD_TOP, h:bandH, xOff });
+  }
+
+  const totalH = PAD_TOP + bandH + 20;
+  return { pos, bands, totalH };
 }
 
 // ── Render swimlanes + column headers ────────────────────────
@@ -512,21 +515,20 @@ function renderBackground(bands, totalH) {
   const bg = $('bg-layer');
   bg.innerHTML = '';
 
-  // Column headers for both left and right columns
-  for (const xOff of [0, COL_OFFSET]) {
+  // Each band draws its own sub-column headers and services panel
+  for (const band of bands) {
+    const xOff = band.xOff;
     for (const { label, x } of [
       { label:'Automations', x: xOff + COL_TASK_X },
       { label:'Tools',       x: xOff + COL_TOOL_X },
       { label:'Services',    x: xOff + COL_SVC_X  },
     ]) {
-      const el = document.createElement('div');
-      el.className = 'col-hdr';
-      el.style.cssText = `left:${x}px;top:${PAD_TOP-26}px;width:${NODE_W}px`;
-      el.textContent = label;
-      bg.appendChild(el);
+      const hdr = document.createElement('div');
+      hdr.className = 'col-hdr';
+      hdr.style.cssText = `left:${x}px;top:${PAD_TOP-26}px;width:${NODE_W}px`;
+      hdr.textContent = label;
+      bg.appendChild(hdr);
     }
-
-    // Services panel per column
     const sp = document.createElement('div');
     sp.className = 'svc-panel';
     sp.style.cssText = `left:${xOff+COL_SVC_X-10}px;top:${PAD_TOP-10}px;width:${NODE_W+20}px;height:${totalH-PAD_TOP+10}px`;
@@ -884,10 +886,11 @@ async function init() {
   setupPanZoom(totalH);
   setupFilters();
 
-  const vw = $('viewport').offsetWidth;
-  zoom = Math.min((vw - 48) / CANVAS_W, 0.82);
+  // Start zoomed to fit the full width so all domain columns are visible
+  const vw = $('viewport').offsetWidth, vh = $('viewport').offsetHeight;
+  zoom = Math.min((vw - 48) / CANVAS_W, (vh - 48) / totalH, 1.0);
   pan.x = Math.max(12, (vw - CANVAS_W * zoom) / 2);
-  pan.y = 18;
+  pan.y = 12;
   applyTransform();
 }
 
