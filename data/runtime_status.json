@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-21T21:30:42.918Z",
+  "updated_at": "2026-06-22T09:30:39.959Z",
   "source": "trigger.dev_api",
   "run_count_fetched": 25,
   "statuses": {
@@ -10,11 +10,11 @@
     "task_eod_review": "needs_testing",
     "task_afterhours": "needs_testing",
     "task_morning_briefing": "needs_testing",
-    "task_weekly_perf": "needs_testing",
-    "task_weekly_content_analytics": "needs_testing",
+    "task_weekly_perf": "autonomous",
+    "task_weekly_content_analytics": "autonomous",
     "task_weekly_content_plan": "needs_testing",
     "task_schedule_post": "autonomous",
-    "task_square_weekly": "needs_testing",
+    "task_square_weekly": "autonomous",
     "task_system_map_update": "autonomous"
   }
 }
