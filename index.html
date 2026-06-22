@@ -57,10 +57,14 @@ header {
 .pill.active[data-domain="finance"]           { color:#10b981; border-color:#10b981; }
 .pill.active[data-domain="infrastructure"]    { color:#94a3b8; border-color:#94a3b8; }
 .pill.active[data-domain="comms"]             { color:#ec4899; border-color:#ec4899; }
+.pill.active[data-domain="onboarding"]        { color:#14b8a6; border-color:#14b8a6; }
+.pill.active[data-domain="future_ventures"]   { color:#f43f5e; border-color:#f43f5e; }
 .pill.active[data-status="autonomous"]    { color:#22c55e; border-color:#22c55e; }
 .pill.active[data-status="tested"]        { color:#f97316; border-color:#f97316; }
 .pill.active[data-status="needs_testing"] { color:#eab308; border-color:#eab308; }
 .pill.active[data-status="broken"]        { color:#ef4444; border-color:#ef4444; }
+.pill.active[data-layer="workflow"]       { color:#818cf8; border-color:#818cf8; }
+.pill.active[data-layer="systems"]        { color:#cbd5e1; border-color:#cbd5e1; }
 
 .search-wrap { position:relative; flex-shrink:0; }
 .search-wrap input {
@@ -193,6 +197,9 @@ header {
 .badge-tested        { color:#f97316; background:rgba(249,115,22,.08); }
 .badge-needs_testing { color:#eab308; background:rgba(234,179,8,.08); }
 .badge-broken        { color:#ef4444; background:rgba(239,68,68,.08); }
+.badge-documented    { color:#818cf8; background:rgba(129,140,248,.08); }
+.badge-stub          { color:#c084fc; background:rgba(192,132,252,.08); }
+.badge-missing       { color:#64748b; background:rgba(100,116,139,.10); }
 .tt-desc { font-size:10.5px; color:var(--text-muted); line-height:1.45; margin-bottom:5px; }
 .tt-row  { display:flex; gap:6px; font-size:10px; margin-top:3px; }
 .tt-row .lbl { color:var(--text-dim); font-family:var(--mono); min-width:48px; flex-shrink:0; }
@@ -211,7 +218,10 @@ header {
 .leg-row { display:flex; align-items:center; gap:7px; margin-bottom:4px; color:var(--text-muted); }
 .leg-dot { width:9px; height:9px; border-radius:50%; border:2px solid currentColor; flex-shrink:0; }
 .green  { color:#22c55e; } .orange { color:#f97316; } .yellow { color:#eab308; } .red { color:#ef4444; }
+.indigo { color:#818cf8; } .violet { color:#c084fc; } .slate { color:#64748b; }
 .glow-g { box-shadow:0 0 5px rgba(34,197,94,.55); } .glow-r { box-shadow:0 0 5px rgba(239,68,68,.55); }
+.leg-sep { height:1px; background:var(--border); margin:7px 0 6px; }
+.leg-dot.dash { border-style:dashed; }
 
 /* ── Stats bar ───────────────────────────────────────────────── */
 #statsbar {
@@ -232,12 +242,14 @@ header {
   <div class="filters">
     <div class="filter-group" id="domain-pills">
       <button class="pill active" data-filter="domain" data-val="all">All</button>
-      <button class="pill" data-filter="domain" data-val="investing" data-domain="investing">Investing</button>
-      <button class="pill" data-filter="domain" data-val="social" data-domain="social">Social</button>
-      <button class="pill" data-filter="domain" data-val="espresso_yourself" data-domain="espresso_yourself">EY Coffee</button>
-      <button class="pill" data-filter="domain" data-val="finance" data-domain="finance">Finance</button>
+      <button class="pill" data-filter="domain" data-val="onboarding" data-domain="onboarding">Onboarding</button>
       <button class="pill" data-filter="domain" data-val="infrastructure" data-domain="infrastructure">Infra</button>
       <button class="pill" data-filter="domain" data-val="comms" data-domain="comms">Comms</button>
+      <button class="pill" data-filter="domain" data-val="social" data-domain="social">Social</button>
+      <button class="pill" data-filter="domain" data-val="espresso_yourself" data-domain="espresso_yourself">EY Coffee</button>
+      <button class="pill" data-filter="domain" data-val="investing" data-domain="investing">Investing</button>
+      <button class="pill" data-filter="domain" data-val="finance" data-domain="finance">Finance</button>
+      <button class="pill" data-filter="domain" data-val="future_ventures" data-domain="future_ventures">Ventures</button>
     </div>
     <div class="vdiv"></div>
     <div class="filter-group" id="status-pills">
@@ -246,6 +258,12 @@ header {
       <button class="pill" data-filter="status" data-val="tested" data-status="tested">Tested</button>
       <button class="pill" data-filter="status" data-val="needs_testing" data-status="needs_testing">Needs Test</button>
       <button class="pill" data-filter="status" data-val="broken" data-status="broken">Broken</button>
+    </div>
+    <div class="vdiv"></div>
+    <div class="filter-group" id="layer-pills">
+      <button class="pill active" data-filter="layer" data-val="all">All Layers</button>
+      <button class="pill" data-filter="layer" data-val="workflow" data-layer="workflow">Workflows</button>
+      <button class="pill" data-filter="layer" data-val="systems" data-layer="systems">Systems</button>
     </div>
     <div class="vdiv"></div>
     <div class="search-wrap">
@@ -267,11 +285,16 @@ header {
 <div id="tooltip"></div>
 
 <div id="legend">
-  <div class="leg-title">Status</div>
+  <div class="leg-title">Execution</div>
   <div class="leg-row"><div class="leg-dot green glow-g"></div> Autonomous</div>
   <div class="leg-row"><div class="leg-dot orange"></div> Tested</div>
   <div class="leg-row"><div class="leg-dot yellow"></div> Needs Testing</div>
   <div class="leg-row"><div class="leg-dot red glow-r"></div> Broken</div>
+  <div class="leg-sep"></div>
+  <div class="leg-title">Workflows</div>
+  <div class="leg-row"><div class="leg-dot indigo"></div> Documented</div>
+  <div class="leg-row"><div class="leg-dot violet"></div> Stub</div>
+  <div class="leg-row"><div class="leg-dot slate dash"></div> Missing</div>
 </div>
 
 <div id="statsbar">
@@ -289,17 +312,21 @@ header {
 <script>
 // ── Constants ─────────────────────────────────────────────────
 const STATUS_COLOR = { autonomous:'#22c55e', tested:'#f97316', needs_testing:'#eab308', broken:'#ef4444' };
+// Workflow doc-states — distinct blue/violet/slate family, never confused with execution rings
+const WF_STATUS_COLOR = { documented:'#818cf8', stub:'#c084fc', missing:'#64748b' };
+const WF_STATUSES = ['documented','stub','missing'];
 const DOMAIN_COLOR = {
   investing:'#3b82f6', social:'#a855f7', espresso_yourself:'#f59e0b',
-  finance:'#10b981', infrastructure:'#64748b', comms:'#ec4899'
+  finance:'#10b981', infrastructure:'#64748b', comms:'#ec4899',
+  onboarding:'#14b8a6', future_ventures:'#f43f5e'
 };
-const DOMAIN_ICON  = { investing:'📈', social:'📱', espresso_yourself:'☕', finance:'💰', infrastructure:'⚙️', comms:'✉️' };
-const DOMAIN_LABEL = { investing:'Investing', social:'Social / Brand', espresso_yourself:'Espresso Yourself', finance:'Finance', infrastructure:'Infrastructure', comms:'Comms' };
-const DOMAIN_ORDER = ['investing','social','espresso_yourself','finance','infrastructure','comms'];
+const DOMAIN_ICON  = { investing:'📈', social:'📱', espresso_yourself:'☕', finance:'💰', infrastructure:'⚙️', comms:'✉️', onboarding:'🧭', future_ventures:'🚀' };
+const DOMAIN_LABEL = { investing:'Investing', social:'Social / Brand', espresso_yourself:'Espresso Yourself', finance:'Finance', infrastructure:'Infrastructure', comms:'Comms', onboarding:'Onboarding', future_ventures:'Future Ventures' };
+const DOMAIN_ORDER = ['investing','social','espresso_yourself','finance','infrastructure','comms','onboarding','future_ventures'];
 // Horizontal display order (left → right) by importance
-const DOMAIN_ORDER_DISPLAY = ['infrastructure','comms','social','espresso_yourself','investing','finance'];
+const DOMAIN_ORDER_DISPLAY = ['onboarding','infrastructure','comms','social','espresso_yourself','investing','finance','future_ventures'];
 
-// Layout — tree mode: auto → tools → services, each branch self-contained
+// Layout — tree mode: workflow → auto → tools → services, each branch self-contained
 const NODE_W = 182, NODE_H = 48, ROW_H = 60;
 const AUTO_GAP = 12;   // px gap between automation groups in a domain
 const DOMAIN_COL_GAP = 18; // horizontal gap between domain swimlanes
@@ -308,17 +335,18 @@ const PAD_X = 20, PAD_TOP = 52;
 
 const COL_LABEL_W = 118, COL_GAP = 14;
 const COL_LABEL_X = PAD_X;
-const COL_TASK_X  = COL_LABEL_X + COL_LABEL_W + COL_GAP;  // 152
-const COL_TOOL_X  = COL_TASK_X  + NODE_W + COL_GAP;        // 348
-const COL_SVC_X   = COL_TOOL_X  + NODE_W + COL_GAP;        // 544
-const HALF_W      = COL_SVC_X   + NODE_W + PAD_X;          // 746
+const COL_WF_X    = COL_LABEL_X + COL_LABEL_W + COL_GAP;  // 152  — Workflows (WAT instructions layer)
+const COL_TASK_X  = COL_WF_X    + NODE_W + COL_GAP;        // 348  — Automations
+const COL_TOOL_X  = COL_TASK_X  + NODE_W + COL_GAP;        // 544  — Tools
+const COL_SVC_X   = COL_TOOL_X  + NODE_W + COL_GAP;        // 740  — Services
+const HALF_W      = COL_SVC_X   + NODE_W + PAD_X;          // 942
 // Total canvas width: all domain columns side-by-side with gaps
 const CANVAS_W    = DOMAIN_ORDER_DISPLAY.length * HALF_W + (DOMAIN_ORDER_DISPLAY.length - 1) * DOMAIN_COL_GAP;
 
 // ── State ──────────────────────────────────────────────────────
 let pan = { x: 24, y: 24 }, zoom = 0.8;
 let dragging = false, dragStart = { x:0, y:0 }, panStart = { x:0, y:0 };
-let activeFilter = { domain:'all', status:'all' };
+let activeFilter = { domain:'all', status:'all', layer:'all' };
 let allNodes = [], nodeById = {};
 let dispNodes = [], dispEdges = [];
 
@@ -327,21 +355,23 @@ const hex2rgba = (h,a) => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice
 const $ = id => document.getElementById(id);
 
 // ── Build expanded display graph ──────────────────────────────
-// Each automation gets its own branch: auto → tool instances → service instances.
-// Tools and services appear once per parent (duplication is intentional).
-// All instances within a domain are tagged with that domain so layout groups them correctly.
+// Four-tier tree per domain: workflow → automation → tool → service.
+// Each node is duplicated per parent branch (intentional) via compound display IDs.
+// Workflows are the WAT "instructions" roots; automations/tools that no workflow
+// references render as orphans starting in their own column.
 function buildDisplayGraph(nodes, edges) {
   const depOf = {};
   for (const e of edges) (depOf[e.from] = depOf[e.from]||[]).push(e.to);
 
   const byDomain = {};
-  for (const d of DOMAIN_ORDER) byDomain[d] = { autos:[], tools:[] };
+  for (const d of DOMAIN_ORDER) byDomain[d] = { workflows:[], autos:[], tools:[] };
 
   for (const n of nodes) {
     if (n.type === 'domain') continue;
     const d = n.domain;
     if (!d || !byDomain[d]) continue;
-    if (['trigger_task','workflow'].includes(n.type)) byDomain[d].autos.push(n);
+    if (n.type === 'workflow') byDomain[d].workflows.push(n);
+    else if (n.type === 'trigger_task') byDomain[d].autos.push(n);
     else if (['tool','api_bridge'].includes(n.type)) byDomain[d].tools.push(n);
   }
 
@@ -352,51 +382,67 @@ function buildDisplayGraph(nodes, edges) {
   }
 
   for (const d of DOMAIN_ORDER) {
-    const { autos, tools } = byDomain[d];
+    const { workflows, autos, tools } = byDomain[d];
     const claimedToolIds = new Set();
+    const claimedAutoIds = new Set();
 
-    for (const auto of autos) {
-      addNode(auto, auto.id, d);   // automations keep their real ID (unique per domain)
-
-      const toolDeps = (depOf[auto.id]||[]).map(id => nodeById[id])
-        .filter(n => n && ['tool','api_bridge'].includes(n.type));
-
-      const directSvcDeps = (depOf[auto.id]||[]).map(id => nodeById[id])
-        .filter(n => n?.type === 'service');
-
-      for (const tool of toolDeps) {
-        claimedToolIds.add(tool.id);
-        const tInst = `${tool.id}::${auto.id}`;
-        addNode(tool, tInst, d);
-        dEdges.push({ from: auto.id, to: tInst });
-
-        const svcDeps = (depOf[tool.id]||[]).map(id => nodeById[id])
-          .filter(n => n?.type === 'service');
-
-        for (const svc of svcDeps) {
-          const sInst = `${svc.id}::${tInst}`;
-          addNode(svc, sInst, d);
-          dEdges.push({ from: tInst, to: sInst });
-        }
-      }
-
-      // Services the automation depends on directly (no tool intermediary)
-      for (const svc of directSvcDeps) {
-        const sInst = `${svc.id}::${auto.id}::d`;
+    // Expand a tool instance under a parent, plus its service children
+    function expandTool(tool, parentInst) {
+      const tInst = `${tool.id}::${parentInst}`;
+      addNode(tool, tInst, d);
+      dEdges.push({ from: parentInst, to: tInst });
+      const svcDeps = (depOf[tool.id]||[]).map(id => nodeById[id]).filter(n => n?.type === 'service');
+      for (const svc of svcDeps) {
+        const sInst = `${svc.id}::${tInst}`;
         addNode(svc, sInst, d);
-        dEdges.push({ from: auto.id, to: sInst });
+        dEdges.push({ from: tInst, to: sInst });
       }
     }
 
-    // Orphan tools: tools in this domain not referenced by any automation above
+    // Expand an automation instance (optionally under a workflow), plus its tool/service children
+    function expandAuto(auto, parentInst) {
+      const aInst = parentInst ? `${auto.id}::${parentInst}` : auto.id;
+      addNode(auto, aInst, d);
+      if (parentInst) dEdges.push({ from: parentInst, to: aInst });
+
+      const deps = (depOf[auto.id]||[]).map(id => nodeById[id]);
+      for (const tool of deps.filter(n => n && ['tool','api_bridge'].includes(n.type))) {
+        claimedToolIds.add(tool.id);
+        expandTool(tool, aInst);
+      }
+      for (const svc of deps.filter(n => n?.type === 'service')) {
+        const sInst = `${svc.id}::${aInst}::d`;
+        addNode(svc, sInst, d);
+        dEdges.push({ from: aInst, to: sInst });
+      }
+    }
+
+    // 1. Workflows are the roots — branch to their automations and/or tools
+    for (const wf of workflows) {
+      addNode(wf, wf.id, d);   // workflows keep their real ID (globally unique)
+      const deps = (depOf[wf.id]||[]).map(id => nodeById[id]);
+      for (const auto of deps.filter(n => n?.type === 'trigger_task')) {
+        claimedAutoIds.add(auto.id);
+        expandAuto(auto, wf.id);
+      }
+      for (const tool of deps.filter(n => n && ['tool','api_bridge'].includes(n.type))) {
+        claimedToolIds.add(tool.id);
+        expandTool(tool, wf.id);
+      }
+    }
+
+    // 2. Orphan automations: no workflow references them — start in the Automations column
+    for (const auto of autos) {
+      if (claimedAutoIds.has(auto.id)) continue;
+      expandAuto(auto, null);
+    }
+
+    // 3. Orphan tools: referenced by no workflow or automation — start in the Tools column
     for (const tool of tools) {
       if (claimedToolIds.has(tool.id)) continue;
       const tInst = `${tool.id}::orphan`;
       addNode(tool, tInst, d);
-
-      const svcDeps = (depOf[tool.id]||[]).map(id => nodeById[id])
-        .filter(n => n?.type === 'service');
-
+      const svcDeps = (depOf[tool.id]||[]).map(id => nodeById[id]).filter(n => n?.type === 'service');
       for (const svc of svcDeps) {
         const sInst = `${svc.id}::${tInst}`;
         addNode(svc, sInst, d);
@@ -409,67 +455,52 @@ function buildDisplayGraph(nodes, edges) {
 }
 
 // ── Per-domain pixel-based tree layout ────────────────────────
-// Returns positions keyed by display ID, relative to domain band origin (y=0).
+// Four-tier recursion: workflow → automation → tool → service.
+// Each node is centered vertically over the union of its descendants;
+// leaves consume one ROW_H. Returns positions keyed by display ID (y relative to band origin).
 function layoutDomainPx(domNodes, xOff, depOf) {
   const pos = {};
   let py = 0;
 
-  const autos     = domNodes.filter(n => ['trigger_task','workflow'].includes(n.type));
-  const orphTools = domNodes.filter(n => ['tool','api_bridge'].includes(n.type) && n.id.endsWith('::orphan'));
+  const nodeByInst = {};
+  for (const n of domNodes) nodeByInst[n.id] = n;
 
-  // Place a tool + its service children; advance py; center tool over its service block
-  function placeToolBlock(toolNode) {
+  // x column for each tier
+  function colXFor(type) {
+    if (type === 'workflow')     return xOff + COL_WF_X;
+    if (type === 'trigger_task') return xOff + COL_TASK_X;
+    if (type === 'service')      return xOff + COL_SVC_X;
+    return xOff + COL_TOOL_X;  // tool, api_bridge
+  }
+
+  // Recursively place a subtree; node centers over its children's block
+  function place(inst) {
+    const node  = nodeByInst[inst];
     const startY = py;
-    const svcKids = (depOf[toolNode.id]||[])
-      .map(id => domNodes.find(n => n.id === id))
-      .filter(n => n?.type === 'service');
+    const kids = (depOf[inst]||[]).map(id => nodeByInst[id]).filter(Boolean);
 
-    if (svcKids.length === 0) {
-      pos[toolNode.id] = { x: xOff + COL_TOOL_X, y: py + (ROW_H - NODE_H) / 2 };
+    if (kids.length === 0) {
+      pos[inst] = { x: colXFor(node.type), y: py + (ROW_H - NODE_H) / 2 };
       py += ROW_H;
     } else {
-      svcKids.forEach(s => {
-        pos[s.id] = { x: xOff + COL_SVC_X, y: py + (ROW_H - NODE_H) / 2 };
-        py += ROW_H;
-      });
+      kids.forEach(k => place(k.id));
       const blockH = py - startY;
-      pos[toolNode.id] = { x: xOff + COL_TOOL_X, y: startY + (blockH - NODE_H) / 2 };
+      pos[inst] = { x: colXFor(node.type), y: startY + (blockH - NODE_H) / 2 };
     }
   }
 
-  for (let ai = 0; ai < autos.length; ai++) {
-    const auto = autos[ai];
-    const autoStartY = py;
+  // Roots = nodes with no parent edge, ordered workflow → automation → tool
+  const hasParent = new Set();
+  for (const n of domNodes) for (const c of (depOf[n.id]||[])) hasParent.add(c);
+  const ROOT_RANK = { workflow:0, trigger_task:1, api_bridge:2, tool:2, service:3 };
+  const roots = domNodes
+    .filter(n => !hasParent.has(n.id))
+    .sort((a, b) => (ROOT_RANK[a.type] ?? 9) - (ROOT_RANK[b.type] ?? 9));
 
-    const toolKids = (depOf[auto.id]||[])
-      .map(id => domNodes.find(n => n.id === id))
-      .filter(n => n && ['tool','api_bridge'].includes(n.type));
-
-    const directSvcKids = (depOf[auto.id]||[])
-      .map(id => domNodes.find(n => n.id === id))
-      .filter(n => n?.type === 'service');
-
-    toolKids.forEach(t => placeToolBlock(t));
-    directSvcKids.forEach(s => {
-      pos[s.id] = { x: xOff + COL_SVC_X, y: py + (ROW_H - NODE_H) / 2 };
-      py += ROW_H;
-    });
-
-    const autoH = py - autoStartY;
-    if (autoH === 0) {
-      // Auto with no children: single row
-      pos[auto.id] = { x: xOff + COL_TASK_X, y: py + (ROW_H - NODE_H) / 2 };
-      py += ROW_H;
-    } else {
-      pos[auto.id] = { x: xOff + COL_TASK_X, y: autoStartY + (autoH - NODE_H) / 2 };
-    }
-
-    if (ai < autos.length - 1) py += AUTO_GAP;
+  for (let i = 0; i < roots.length; i++) {
+    place(roots[i].id);
+    if (i < roots.length - 1) py += AUTO_GAP;
   }
-
-  // Orphan tools placed after all automation groups
-  if (autos.length > 0 && orphTools.length > 0) py += AUTO_GAP;
-  orphTools.forEach(t => placeToolBlock(t));
 
   return { pos, totalPx: py };
 }
@@ -519,6 +550,7 @@ function renderBackground(bands, totalH) {
   for (const band of bands) {
     const xOff = band.xOff;
     for (const { label, x } of [
+      { label:'Workflows',   x: xOff + COL_WF_X   },
       { label:'Automations', x: xOff + COL_TASK_X },
       { label:'Tools',       x: xOff + COL_TOOL_X },
       { label:'Services',    x: xOff + COL_SVC_X  },
@@ -547,9 +579,10 @@ function renderBackground(bands, totalH) {
     el.style.background = hex2rgba(dc, 0.035);
     el.style.borderColor = hex2rgba(dc, 0.15);
 
-    const domNodes  = allNodes.filter(n => n.domain === band.domain && n.type !== 'domain');
-    const autoCount = domNodes.filter(n => n.status==='autonomous').length;
-    const health    = domNodes.length ? `${autoCount}/${domNodes.length} auto` : '';
+    // Workflows are docs, not executing nodes — excluded from the autonomous health math
+    const execNodes = allNodes.filter(n => n.domain === band.domain && n.type !== 'domain' && n.type !== 'workflow');
+    const autoCount = execNodes.filter(n => n.status==='autonomous').length;
+    const health    = execNodes.length ? `${autoCount}/${execNodes.length} auto` : 'docs only';
 
     el.innerHTML = `
       <div class="swimlane-header">
@@ -571,7 +604,9 @@ function renderNodes(nodes, pos) {
     const p = pos[n.id];
     if (!p) continue;
 
-    const sc = STATUS_COLOR[n.status] || '#475569';
+    const isWf = n.type === 'workflow';
+    // Workflows use the doc-state palette; everything else uses execution status colors
+    const sc = isWf ? (WF_STATUS_COLOR[n.status] || '#64748b') : (STATUS_COLOR[n.status] || '#475569');
     const dc = DOMAIN_COLOR[n.domain]  || '#475569';
 
     const iconHtml = n.icon_url
@@ -579,13 +614,15 @@ function renderNodes(nodes, pos) {
       : `<span>${n.icon_type==='emoji' ? n.icon_value : (n.icon_value||'--').slice(0,2)}</span>`;
 
     const card = document.createElement('div');
-    card.className = 'node-card';
+    card.className = 'node-card' + (isWf ? ' wf-card' : '');
     card.dataset.id         = n.id;
     card.dataset.originalId = n.originalId || n.id;
     card.dataset.domain     = n.domain;
     card.dataset.status     = n.status;
     card.dataset.type       = n.type;
-    card.style.cssText  = `left:${p.x}px;top:${p.y}px;width:${NODE_W}px;height:${NODE_H}px;border-left-color:${sc};`;
+    // Missing-doc workflows render hollow/dashed to read as a gap
+    const dashed = (isWf && n.status === 'missing') ? 'border-style:dashed;opacity:.72;' : '';
+    card.style.cssText  = `left:${p.x}px;top:${p.y}px;width:${NODE_W}px;height:${NODE_H}px;border-left-color:${sc};${dashed}`;
 
     card.innerHTML = `
       <div class="nc-icon" style="background:${hex2rgba(dc,.12)};color:${hex2rgba(dc,.9)}">${iconHtml}</div>
@@ -613,7 +650,7 @@ function renderEdges(edges, pos, dNodes) {
       </marker>
     </defs>`;
 
-  const TYPE_COL = { trigger_task:2, workflow:2, api_bridge:3, tool:3, service:4 };
+  const TYPE_COL = { workflow:1, trigger_task:2, api_bridge:3, tool:3, service:4 };
   const nodeType = {};
   for (const n of dNodes) nodeType[n.id] = n.type;
 
@@ -742,16 +779,19 @@ function clearHighlight() {
 
 // ── Filters ────────────────────────────────────────────────────
 function applyFilters() {
-  const { domain, status } = activeFilter;
+  const { domain, status, layer } = activeFilter;
   const searchQ = $('search').value.toLowerCase().trim();
 
   for (const card of $('node-layer').querySelectorAll('.node-card')) {
-    const dm = card.dataset.domain, st = card.dataset.status;
+    const dm = card.dataset.domain, st = card.dataset.status, ty = card.dataset.type;
+    const isWf = ty === 'workflow';
     const n  = nodeById[card.dataset.originalId] || {};
     const domainOk  = domain === 'all' || dm === domain;
-    const statusOk  = status === 'all' || st === status;
+    // Execution-status filter never applies to workflows (their statuses are doc-states)
+    const statusOk  = status === 'all' || isWf || st === status;
+    const layerOk   = layer === 'all' || (layer === 'workflow' ? isWf : !isWf);
     const searchOk  = !searchQ || (n.label||'').toLowerCase().includes(searchQ) || (n.description||'').toLowerCase().includes(searchQ);
-    card.classList.toggle('dimmed', !(domainOk && statusOk && searchOk));
+    card.classList.toggle('dimmed', !(domainOk && statusOk && layerOk && searchOk));
   }
 
   // Dim edges if either endpoint is dimmed
@@ -788,7 +828,7 @@ function showTip(n, e) {
     const iconHtml = n.icon_url
       ? `<img src="${n.icon_url}" width="14" height="14" onerror="this.style.display='none'">`
       : `<span style="font-size:12px">${n.icon_type==='emoji'?n.icon_value:(n.icon_value||'').slice(0,2)}</span>`;
-    const statusLabel = { autonomous:'Autonomous', tested:'Tested', needs_testing:'Needs Testing', broken:'Broken' };
+    const statusLabel = { autonomous:'Autonomous', tested:'Tested', needs_testing:'Needs Testing', broken:'Broken', documented:'Documented', stub:'Stub', missing:'Missing SOP' };
     const countdown = getCountdown(n.schedule);
 
     tip.innerHTML = `
