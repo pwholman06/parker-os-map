@@ -145,6 +145,54 @@
       }
     },
     {
+      "id": "domain_onboarding",
+      "label": "Onboarding",
+      "type": "domain",
+      "domain": "onboarding",
+      "status": "tested",
+      "description": "Foundational profiles and context that ground the entire Parker OS.",
+      "schedule": null,
+      "file_path": null,
+      "github_url": null,
+      "notes": null,
+      "border_color": "#f97316",
+      "size": 55,
+      "icon_type": "emoji",
+      "icon_value": "\ud83e\udded",
+      "icon_url": null,
+      "sub_label": "0/0 autonomous",
+      "x": -880,
+      "y": -60,
+      "fixed": {
+        "x": true,
+        "y": true
+      }
+    },
+    {
+      "id": "domain_future_ventures",
+      "label": "Future Ventures",
+      "type": "domain",
+      "domain": "future_ventures",
+      "status": "tested",
+      "description": "Research and validation of new business ideas before committing capital.",
+      "schedule": null,
+      "file_path": null,
+      "github_url": null,
+      "notes": null,
+      "border_color": "#f97316",
+      "size": 55,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\ude80",
+      "icon_url": null,
+      "sub_label": "0/0 autonomous",
+      "x": 880,
+      "y": -120,
+      "fixed": {
+        "x": true,
+        "y": true
+      }
+    },
+    {
       "id": "svc_robinhood",
       "label": "Robinhood",
       "type": "service",
@@ -2138,6 +2186,489 @@
       "x": -160,
       "y": 200,
       "fixed": false
+    },
+    {
+      "id": "wf_dispatch",
+      "label": "Dispatch",
+      "type": "workflow",
+      "domain": "comms",
+      "status": "documented",
+      "description": "Send instructions from iPhone via Telegram; Claude executes on the DO droplet with full Parker OS context.",
+      "schedule": null,
+      "file_path": "workflows/dispatch.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/dispatch.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -560,
+      "y": 300,
+      "fixed": false
+    },
+    {
+      "id": "wf_gmail",
+      "label": "Gmail",
+      "type": "workflow",
+      "domain": "comms",
+      "status": "documented",
+      "description": "Read, search, draft, send, reply, unsubscribe, label, and flag emails across Parker's three Gmail accounts.",
+      "schedule": null,
+      "file_path": "workflows/gmail.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/gmail.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -560,
+      "y": 300,
+      "fixed": false
+    },
+    {
+      "id": "wf_google_calendar",
+      "label": "Google Calendar",
+      "type": "workflow",
+      "domain": "comms",
+      "status": "documented",
+      "description": "List, create, and sync calendar events across personal and EY calendars, keeping Notion Master Calendar in sync.",
+      "schedule": null,
+      "file_path": "workflows/google_calendar.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/google_calendar.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -560,
+      "y": 300,
+      "fixed": false
+    },
+    {
+      "id": "wf_social_media",
+      "label": "Social Media Mgmt",
+      "type": "workflow",
+      "domain": "social",
+      "status": "documented",
+      "description": "Agency-style management of EY and Personal Brand social: analytics, posting, comment/DM management, weekly reporting.",
+      "schedule": null,
+      "file_path": "workflows/social_media.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/social_media.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 260,
+      "y": -380,
+      "fixed": false
+    },
+    {
+      "id": "wf_pb_account_setup",
+      "label": "Account Setup",
+      "type": "workflow",
+      "domain": "social",
+      "status": "documented",
+      "description": "Get Parker live on Instagram, TikTok, and YouTube with consistent professional branding before posting.",
+      "schedule": null,
+      "file_path": "workflows/personal_brand/account_setup.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/account_setup.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 260,
+      "y": -380,
+      "fixed": false
+    },
+    {
+      "id": "wf_pb_competitor_analysis",
+      "label": "Competitor Analysis",
+      "type": "workflow",
+      "domain": "social",
+      "status": "documented",
+      "description": "Produce a standardized clickable PDF deep-dive on a creator Parker models; log to the Competitor Models Notion list.",
+      "schedule": null,
+      "file_path": "workflows/personal_brand/competitor_analysis.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/competitor_analysis.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 260,
+      "y": -380,
+      "fixed": false
+    },
+    {
+      "id": "wf_pb_competitor_template",
+      "label": "Analysis Template",
+      "type": "workflow",
+      "domain": "social",
+      "status": "documented",
+      "description": "Standardized template skeleton for competitor deep-dive PDFs.",
+      "schedule": null,
+      "file_path": "workflows/personal_brand/competitor_analysis_template.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/competitor_analysis_template.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 260,
+      "y": -380,
+      "fixed": false
+    },
+    {
+      "id": "wf_pb_competitor_research",
+      "label": "Competitor Research",
+      "type": "workflow",
+      "domain": "social",
+      "status": "documented",
+      "description": "Identify 3 north-star creators Parker models his brand after; build a full competitive map of the niche.",
+      "schedule": null,
+      "file_path": "workflows/personal_brand/competitor_research.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/competitor_research.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 260,
+      "y": -380,
+      "fixed": false
+    },
+    {
+      "id": "wf_pb_content_calendar",
+      "label": "Content Calendar",
+      "type": "workflow",
+      "domain": "social",
+      "status": "documented",
+      "description": "Keep the content pipeline filled automatically; every Monday a fresh week of ideas lands in Notion for approval.",
+      "schedule": null,
+      "file_path": "workflows/personal_brand/content_calendar.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/content_calendar.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 260,
+      "y": -380,
+      "fixed": false
+    },
+    {
+      "id": "wf_pb_content_strategy",
+      "label": "Content Strategy",
+      "type": "workflow",
+      "domain": "social",
+      "status": "documented",
+      "description": "Define Parker's content playbook: what he posts, how often, in what format, and why.",
+      "schedule": null,
+      "file_path": "workflows/personal_brand/content_strategy.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/content_strategy.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 260,
+      "y": -380,
+      "fixed": false
+    },
+    {
+      "id": "wf_ey_readme",
+      "label": "EY Operations",
+      "type": "workflow",
+      "domain": "espresso_yourself",
+      "status": "documented",
+      "description": "Run EY lead gen and scaling: prospect discovery, campaigns, follow-ups, Square reporting, inbound email triage.",
+      "schedule": null,
+      "file_path": "workflows/espresso_yourself/README.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/espresso_yourself/README.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 560,
+      "y": 80,
+      "fixed": false
+    },
+    {
+      "id": "wf_ey_profile",
+      "label": "EY Profile",
+      "type": "workflow",
+      "domain": "espresso_yourself",
+      "status": "documented",
+      "description": "Source of truth for all EY communications. Every EY tool/automation reads this before drafting anything.",
+      "schedule": null,
+      "file_path": "workflows/espresso_yourself/ey_profile.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/espresso_yourself/ey_profile.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 560,
+      "y": 80,
+      "fixed": false
+    },
+    {
+      "id": "wf_investing_readme",
+      "label": "Trading Windows",
+      "type": "workflow",
+      "domain": "investing",
+      "status": "documented",
+      "description": "Defines the six daily trading windows and the scan-to-order pipeline driving the Robinhood agentic account.",
+      "schedule": null,
+      "file_path": "workflows/investing/README.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/investing/README.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -580,
+      "y": -260,
+      "fixed": false
+    },
+    {
+      "id": "wf_system_map",
+      "label": "System Map",
+      "type": "workflow",
+      "domain": "infrastructure",
+      "status": "documented",
+      "description": "Maintain the living system map: update node status, add nodes, regenerate, and deploy to GitHub Pages.",
+      "schedule": null,
+      "file_path": "workflows/system_map.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/system_map.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -160,
+      "y": 200,
+      "fixed": false
+    },
+    {
+      "id": "wf_wispr",
+      "label": "Wispr Voice Input",
+      "type": "workflow",
+      "domain": "infrastructure",
+      "status": "documented",
+      "description": "Use Wispr Flow as a system-wide AI mic to dictate text into any focused input field across Mac and iPhone.",
+      "schedule": null,
+      "file_path": "workflows/wispr_voice_input.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/wispr_voice_input.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -160,
+      "y": 200,
+      "fixed": false
+    },
+    {
+      "id": "wf_rag",
+      "label": "RAG Knowledge Base",
+      "type": "workflow",
+      "domain": "infrastructure",
+      "status": "documented",
+      "description": "Turn documents, competitor analyses, research, and workflows into a searchable, grounded knowledge base.",
+      "schedule": null,
+      "file_path": "workflows/rag/README.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/rag/README.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -160,
+      "y": 200,
+      "fixed": false
+    },
+    {
+      "id": "wf_scraping",
+      "label": "Web Scraping",
+      "type": "workflow",
+      "domain": "infrastructure",
+      "status": "documented",
+      "description": "Pull leads, research, and content sources off the open web via Firecrawl and route them into Notion.",
+      "schedule": null,
+      "file_path": "workflows/scraping/README.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/scraping/README.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -160,
+      "y": 200,
+      "fixed": false
+    },
+    {
+      "id": "wf_trigger",
+      "label": "Trigger.dev Automations",
+      "type": "workflow",
+      "domain": "infrastructure",
+      "status": "documented",
+      "description": "Add, test, and deploy scheduled or event-driven TypeScript automations to Trigger.dev.",
+      "schedule": null,
+      "file_path": "workflows/trigger/README.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/trigger/README.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -160,
+      "y": 200,
+      "fixed": false
+    },
+    {
+      "id": "wf_website",
+      "label": "Website Building",
+      "type": "workflow",
+      "domain": "infrastructure",
+      "status": "documented",
+      "description": "Scaffold, design, preview, and deploy a polished website for any Parker venture.",
+      "schedule": null,
+      "file_path": "workflows/website/README.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/website/README.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -160,
+      "y": 200,
+      "fixed": false
+    },
+    {
+      "id": "wf_website_design",
+      "label": "Website Design Rules",
+      "type": "workflow",
+      "domain": "infrastructure",
+      "status": "documented",
+      "description": "Frontend design standards read before building any page (invoke frontend-design skill, style brief, etc.).",
+      "schedule": null,
+      "file_path": "workflows/website/design_rules.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/website/design_rules.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -160,
+      "y": 200,
+      "fixed": false
+    },
+    {
+      "id": "wf_parker_profile",
+      "label": "Parker Profile",
+      "type": "workflow",
+      "domain": "onboarding",
+      "status": "documented",
+      "description": "The master profile: who Parker is, his mission, voice, and goals. Foundational context for the whole system.",
+      "schedule": null,
+      "file_path": "workflows/onboarding/parker_profile.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/onboarding/parker_profile.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -880,
+      "y": -60,
+      "fixed": false
+    },
+    {
+      "id": "wf_future_ventures",
+      "label": "Future Ventures",
+      "type": "workflow",
+      "domain": "future_ventures",
+      "status": "documented",
+      "description": "Research, validate, and track business ideas before committing time or capital (Ideas Board live in Notion).",
+      "schedule": null,
+      "file_path": "workflows/future_ventures/README.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/future_ventures/README.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 880,
+      "y": -120,
+      "fixed": false
+    },
+    {
+      "id": "wf_finance_missing",
+      "label": "Finance SOP (missing)",
+      "type": "workflow",
+      "domain": "finance",
+      "status": "missing",
+      "description": "No workflow documents the finance tools yet. Gap surfaced by the map: these tools run without a written SOP.",
+      "schedule": null,
+      "file_path": null,
+      "github_url": null,
+      "notes": null,
+      "border_color": "#64748b",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "sub_label": "",
+      "x": 220,
+      "y": 320,
+      "fixed": false
     }
   ],
   "edges": [
@@ -2644,16 +3175,214 @@
     {
       "from": "tool_system_map_update",
       "to": "svc_trigger"
+    },
+    {
+      "from": "wf_dispatch",
+      "to": "telegram_dispatch"
+    },
+    {
+      "from": "wf_gmail",
+      "to": "gmail_read"
+    },
+    {
+      "from": "wf_gmail",
+      "to": "gmail_send"
+    },
+    {
+      "from": "wf_gmail",
+      "to": "gmail_reply"
+    },
+    {
+      "from": "wf_gmail",
+      "to": "gmail_search"
+    },
+    {
+      "from": "wf_gmail",
+      "to": "gmail_summarize"
+    },
+    {
+      "from": "wf_gmail",
+      "to": "gmail_flag_notion"
+    },
+    {
+      "from": "wf_gmail",
+      "to": "gmail_unsubscribe"
+    },
+    {
+      "from": "wf_google_calendar",
+      "to": "cal_list_events"
+    },
+    {
+      "from": "wf_google_calendar",
+      "to": "cal_create_event"
+    },
+    {
+      "from": "wf_google_calendar",
+      "to": "cal_sync_notion"
+    },
+    {
+      "from": "wf_social_media",
+      "to": "ig_read_posts"
+    },
+    {
+      "from": "wf_social_media",
+      "to": "ig_create_post"
+    },
+    {
+      "from": "wf_social_media",
+      "to": "ig_account_insights"
+    },
+    {
+      "from": "wf_social_media",
+      "to": "ig_reply_dm"
+    },
+    {
+      "from": "wf_social_media",
+      "to": "ig_read_comments"
+    },
+    {
+      "from": "wf_social_media",
+      "to": "fb_create_post"
+    },
+    {
+      "from": "wf_social_media",
+      "to": "fb_page_insights"
+    },
+    {
+      "from": "wf_pb_competitor_analysis",
+      "to": "competitor_scrape"
+    },
+    {
+      "from": "wf_pb_competitor_analysis",
+      "to": "content_analyzer"
+    },
+    {
+      "from": "wf_pb_competitor_research",
+      "to": "competitor_scrape"
+    },
+    {
+      "from": "wf_pb_competitor_research",
+      "to": "scrapecreators_client"
+    },
+    {
+      "from": "wf_pb_content_calendar",
+      "to": "task_weekly_content_plan"
+    },
+    {
+      "from": "wf_pb_content_calendar",
+      "to": "task_schedule_post"
+    },
+    {
+      "from": "wf_pb_content_strategy",
+      "to": "content_analyzer"
+    },
+    {
+      "from": "wf_ey_readme",
+      "to": "event_scout"
+    },
+    {
+      "from": "wf_ey_readme",
+      "to": "ey_campaign"
+    },
+    {
+      "from": "wf_ey_readme",
+      "to": "ey_followup"
+    },
+    {
+      "from": "wf_ey_readme",
+      "to": "square_report"
+    },
+    {
+      "from": "wf_ey_readme",
+      "to": "email_scanner"
+    },
+    {
+      "from": "wf_investing_readme",
+      "to": "task_early_premarket"
+    },
+    {
+      "from": "wf_investing_readme",
+      "to": "task_premarket"
+    },
+    {
+      "from": "wf_investing_readme",
+      "to": "task_morning_scan"
+    },
+    {
+      "from": "wf_investing_readme",
+      "to": "task_midday_check"
+    },
+    {
+      "from": "wf_investing_readme",
+      "to": "task_eod_review"
+    },
+    {
+      "from": "wf_investing_readme",
+      "to": "task_afterhours"
+    },
+    {
+      "from": "wf_system_map",
+      "to": "task_system_map_update"
+    },
+    {
+      "from": "wf_system_map",
+      "to": "tool_system_map_update"
+    },
+    {
+      "from": "wf_rag",
+      "to": "rag_index"
+    },
+    {
+      "from": "wf_rag",
+      "to": "rag_query"
+    },
+    {
+      "from": "wf_scraping",
+      "to": "firecrawl_client"
+    },
+    {
+      "from": "wf_scraping",
+      "to": "scrape_page"
+    },
+    {
+      "from": "wf_scraping",
+      "to": "search_scrape"
+    },
+    {
+      "from": "wf_scraping",
+      "to": "extract_leads"
+    },
+    {
+      "from": "wf_scraping",
+      "to": "leads_to_notion"
+    },
+    {
+      "from": "wf_website",
+      "to": "website_new_site"
+    },
+    {
+      "from": "wf_website",
+      "to": "website_deploy"
+    },
+    {
+      "from": "wf_finance_missing",
+      "to": "finance_tracker"
+    },
+    {
+      "from": "wf_finance_missing",
+      "to": "plaid_sync"
     }
   ],
   "meta": {
-    "generated_at": "2026-06-21T19:38:39.775919+00:00",
-    "node_count": 101,
-    "edge_count": 126,
+    "generated_at": "2026-06-22T02:11:17.141582+00:00",
+    "node_count": 126,
+    "edge_count": 175,
     "status_counts": {
-      "tested": 60,
+      "tested": 62,
       "autonomous": 20,
-      "needs_testing": 21
+      "needs_testing": 21,
+      "documented": 22,
+      "missing": 1
     },
     "domain_health": {
       "infrastructure": {
