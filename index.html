@@ -877,7 +877,8 @@ function getCountdown(schedule) {
 
 // ── Stats bar ──────────────────────────────────────────────────
 function updateStats(meta, runtimeMeta) {
-  $('st-nodes').textContent = `${meta.node_count||0} nodes`;
+  // Count from allNodes so auto-discovered workflows are included
+  $('st-nodes').textContent = `${allNodes.length||meta.node_count||0} nodes`;
   $('st-edges').textContent = `${meta.edge_count||0} edges`;
   // Recount from allNodes so runtime overrides are reflected
   const sc = {};
@@ -915,6 +916,25 @@ async function init() {
 
   allNodes = data.nodes;
   for (const n of allNodes) nodeById[n.id] = n;
+
+  // Merge auto-discovered workflows (pushed by system-map-update / discover_workflows.py).
+  // New SOPs appear without editing the registry; curated ones (already on the map) win.
+  try {
+    const wr = await fetch('data/workflow_discovery.json');
+    if (wr.ok) {
+      const wd = await wr.json();
+      const knownPaths = new Set(allNodes.filter(n => n.type === 'workflow' && n.file_path).map(n => n.file_path));
+      let addedWf = 0;
+      for (const w of (wd.discovered || [])) {
+        if (nodeById[w.id]) continue;
+        if (w.file_path && knownPaths.has(w.file_path)) continue;   // curated copy wins
+        allNodes.push(w);
+        nodeById[w.id] = w;
+        addedWf++;
+      }
+      if (addedWf) console.log(`[system-map] Merged ${addedWf} auto-discovered workflow(s)`);
+    }
+  } catch(_) { /* workflow_discovery.json is optional */ }
 
   // Apply runtime status overrides (pushed by system-map-update task at 5:30 AM/PM)
   let runtimeMeta = null;
