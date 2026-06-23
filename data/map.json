@@ -16,7 +16,7 @@
       "icon_type": "emoji",
       "icon_value": "\ud83d\udcc8",
       "icon_url": null,
-      "sub_label": "0/19 autonomous",
+      "sub_label": "0/24 autonomous",
       "x": -580,
       "y": -260,
       "fixed": {
@@ -513,7 +513,7 @@
       "type": "api_bridge",
       "domain": "investing",
       "status": "tested",
-      "description": "FastAPI microservice on Railway. Handles Robinhood trade execution, approval queue (24hr TTL), exit signals, and portfolio sync.",
+      "description": "FastAPI microservice on Railway. Handles Robinhood trade execution, approval queue (24hr TTL), exit signals, and portfolio sync. Agent endpoints: /market-research, /build-model, /earnings-watch, /earnings-review.",
       "schedule": null,
       "file_path": null,
       "github_url": null,
@@ -2669,6 +2669,132 @@
       "x": 220,
       "y": 320,
       "fixed": false
+    },
+    {
+      "id": "agent_market_researcher",
+      "label": "Market Researcher",
+      "type": "tool",
+      "domain": "investing",
+      "status": "tested",
+      "description": "Claude agent (top-down strategist): reads market regime, favored/avoid sectors, and watchlist add/drop candidates. Runs in Phase 1 of every scan and can only tighten posture.",
+      "schedule": null,
+      "file_path": "tools/investing/agents/market_researcher.py",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/tools/investing/agents/market_researcher.py",
+      "notes": null,
+      "border_color": "#f97316",
+      "size": 18,
+      "icon_type": "initials",
+      "icon_value": "MR",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -580,
+      "y": -260,
+      "fixed": false
+    },
+    {
+      "id": "agent_model_builder",
+      "label": "Model Builder",
+      "type": "tool",
+      "domain": "investing",
+      "status": "tested",
+      "description": "Claude agent: turns a deep_research thesis into a probability-weighted bull/base/bear model (expected value, 0-100 score, sizing tier). Drives position sizing in Phase 2.",
+      "schedule": null,
+      "file_path": "tools/investing/agents/model_builder.py",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/tools/investing/agents/model_builder.py",
+      "notes": null,
+      "border_color": "#f97316",
+      "size": 18,
+      "icon_type": "initials",
+      "icon_value": "MB",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -580,
+      "y": -260,
+      "fixed": false
+    },
+    {
+      "id": "agent_earnings_reviewer",
+      "label": "Earnings Reviewer",
+      "type": "tool",
+      "domain": "investing",
+      "status": "tested",
+      "description": "Claude agent: pre-earnings gap-risk watch + post-earnings results review (yfinance + Claude). Actionable trims route through the same exit guardrails (<=$200 auto / >$200 approval).",
+      "schedule": null,
+      "file_path": "tools/investing/agents/earnings_reviewer.py",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/tools/investing/agents/earnings_reviewer.py",
+      "notes": null,
+      "border_color": "#f97316",
+      "size": 18,
+      "icon_type": "initials",
+      "icon_value": "ER",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -580,
+      "y": -260,
+      "fixed": false
+    },
+    {
+      "id": "task_market_research",
+      "label": "Market Research (5:45 AM)",
+      "type": "trigger_task",
+      "domain": "investing",
+      "status": "needs_testing",
+      "description": "Trigger.dev schedule (5:45 AM ET): calls the bridge Market Researcher before the 6 AM scan and pushes the regime/watchlist read to Notion. Built, not yet deployed.",
+      "schedule": null,
+      "file_path": "trigger/src/trigger/market-scanner/market-research.ts",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/trigger/src/trigger/market-scanner/market-research.ts",
+      "notes": null,
+      "border_color": "#eab308",
+      "size": 30,
+      "icon_type": "initials",
+      "icon_value": "MR",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -580,
+      "y": -260,
+      "fixed": false
+    },
+    {
+      "id": "task_earnings_watch",
+      "label": "Earnings Watch (4 PM)",
+      "type": "trigger_task",
+      "domain": "investing",
+      "status": "needs_testing",
+      "description": "Trigger.dev schedule (4:00 PM ET): pre-earnings gap-risk watch over holdings + watchlist; routes trims through exit guardrails; pushes to Notion. Built, not yet deployed.",
+      "schedule": null,
+      "file_path": "trigger/src/trigger/market-scanner/earnings-watch.ts",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/trigger/src/trigger/market-scanner/earnings-watch.ts",
+      "notes": null,
+      "border_color": "#eab308",
+      "size": 30,
+      "icon_type": "initials",
+      "icon_value": "EW",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -580,
+      "y": -260,
+      "fixed": false
+    },
+    {
+      "id": "wf_investing_agents",
+      "label": "Investing Agents",
+      "type": "workflow",
+      "domain": "investing",
+      "status": "documented",
+      "description": "SOP for the investing agent layer: Market Researcher, Model Builder, Earnings Reviewer - roles, prompts, data sources, integration points, and autonomy rules.",
+      "schedule": null,
+      "file_path": "workflows/investing/agents.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/investing/agents.md",
+      "notes": null,
+      "border_color": "#818cf8",
+      "size": 24,
+      "icon_type": "emoji",
+      "icon_value": "\ud83e\udd16",
+      "icon_url": null,
+      "sub_label": "",
+      "x": -580,
+      "y": -260,
+      "fixed": false
     }
   ],
   "edges": [
@@ -3371,17 +3497,89 @@
     {
       "from": "wf_finance_missing",
       "to": "plaid_sync"
+    },
+    {
+      "from": "agent_market_researcher",
+      "to": "macro_scanner"
+    },
+    {
+      "from": "agent_market_researcher",
+      "to": "politician_tracker"
+    },
+    {
+      "from": "agent_market_researcher",
+      "to": "svc_anthropic"
+    },
+    {
+      "from": "agent_market_researcher",
+      "to": "svc_robinhood"
+    },
+    {
+      "from": "agent_model_builder",
+      "to": "deep_research"
+    },
+    {
+      "from": "agent_model_builder",
+      "to": "svc_anthropic"
+    },
+    {
+      "from": "agent_earnings_reviewer",
+      "to": "svc_anthropic"
+    },
+    {
+      "from": "agent_earnings_reviewer",
+      "to": "svc_robinhood"
+    },
+    {
+      "from": "task_market_research",
+      "to": "railway_bridge"
+    },
+    {
+      "from": "task_market_research",
+      "to": "svc_trigger"
+    },
+    {
+      "from": "task_earnings_watch",
+      "to": "railway_bridge"
+    },
+    {
+      "from": "task_earnings_watch",
+      "to": "svc_trigger"
+    },
+    {
+      "from": "task_earnings_watch",
+      "to": "svc_notion"
+    },
+    {
+      "from": "wf_investing_agents",
+      "to": "task_market_research"
+    },
+    {
+      "from": "wf_investing_agents",
+      "to": "task_earnings_watch"
+    },
+    {
+      "from": "wf_investing_agents",
+      "to": "agent_market_researcher"
+    },
+    {
+      "from": "wf_investing_agents",
+      "to": "agent_model_builder"
+    },
+    {
+      "from": "wf_investing_agents",
+      "to": "agent_earnings_reviewer"
     }
   ],
   "meta": {
-    "generated_at": "2026-06-22T18:19:15.496244+00:00",
-    "node_count": 126,
-    "edge_count": 175,
+    "generated_at": "2026-06-23T01:32:56.686138+00:00",
+    "node_count": 132,
+    "edge_count": 193,
     "status_counts": {
-      "tested": 62,
+      "tested": 65,
       "autonomous": 20,
-      "needs_testing": 21,
-      "documented": 22,
+      "needs_testing": 23,
+      "documented": 23,
       "missing": 1
     },
     "domain_health": {
@@ -3407,7 +3605,7 @@
       },
       "investing": {
         "autonomous": 0,
-        "total": 19
+        "total": 24
       }
     },
     "warnings": 0,
