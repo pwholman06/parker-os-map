@@ -1,6 +1,37 @@
 {
-  "updated_at": "2026-06-22T17:47:01.705Z",
+  "updated_at": "2026-06-23T03:17:50.956Z",
   "source": "github_tree",
   "code_repo": "pwholman06/parker-os",
-  "discovered": []
+  "discovered": [
+    {
+      "id": "wfauto_espresso_yourself_booking_revenue_reporting",
+      "label": "Booking Revenue Reporting",
+      "type": "workflow",
+      "domain": "espresso_yourself",
+      "status": "documented",
+      "description": "Auto-discovered workflow SOP. Not yet curated with dependencies.",
+      "file_path": "workflows/espresso_yourself/booking_revenue_reporting.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/espresso_yourself/booking_revenue_reporting.md",
+      "icon_type": "emoji",
+      "icon_value": "📄",
+      "icon_url": null,
+      "depends_on": [],
+      "auto_discovered": true
+    },
+    {
+      "id": "wfauto_reminders",
+      "label": "Reminders",
+      "type": "workflow",
+      "domain": "infrastructure",
+      "status": "documented",
+      "description": "Auto-discovered workflow SOP. Not yet curated with dependencies.",
+      "file_path": "workflows/reminders.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/reminders.md",
+      "icon_type": "emoji",
+      "icon_value": "📄",
+      "icon_url": null,
+      "depends_on": [],
+      "auto_discovered": true
+    }
+  ]
 }
