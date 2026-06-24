@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-06-24T20:35:54.340917+00:00",
-  "source": "filesystem",
+  "updated_at": "2026-06-24T21:30:20.585Z",
+  "source": "github_tree",
   "code_repo": "pwholman06/parker-os",
   "discovered": [
     {
@@ -13,7 +13,7 @@
       "file_path": "workflows/espresso_yourself/booking_revenue_reporting.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/espresso_yourself/booking_revenue_reporting.md",
       "icon_type": "emoji",
-      "icon_value": "\ud83d\udcc4",
+      "icon_value": "📄",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -28,7 +28,7 @@
       "file_path": "workflows/investing/swing-desk-upgrade.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/investing/swing-desk-upgrade.md",
       "icon_type": "emoji",
-      "icon_value": "\ud83d\udcc4",
+      "icon_value": "📄",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -43,7 +43,7 @@
       "file_path": "workflows/media/nano_banana.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/media/nano_banana.md",
       "icon_type": "emoji",
-      "icon_value": "\ud83d\udcc4",
+      "icon_value": "📄",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -58,7 +58,7 @@
       "file_path": "workflows/personal_brand/skool_community.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/skool_community.md",
       "icon_type": "emoji",
-      "icon_value": "\ud83d\udcc4",
+      "icon_value": "📄",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -73,7 +73,7 @@
       "file_path": "workflows/reminders.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/reminders.md",
       "icon_type": "emoji",
-      "icon_value": "\ud83d\udcc4",
+      "icon_value": "📄",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
