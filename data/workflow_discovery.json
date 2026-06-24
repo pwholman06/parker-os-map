@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-24T17:18:41.015967+00:00",
+  "updated_at": "2026-06-24T20:35:54.340917+00:00",
   "source": "filesystem",
   "code_repo": "pwholman06/parker-os",
   "discovered": [
@@ -12,6 +12,36 @@
       "description": "Auto-discovered workflow SOP. Not yet curated with dependencies.",
       "file_path": "workflows/espresso_yourself/booking_revenue_reporting.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/espresso_yourself/booking_revenue_reporting.md",
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "depends_on": [],
+      "auto_discovered": true
+    },
+    {
+      "id": "wfauto_investing_swing_desk_upgrade",
+      "label": "Swing Desk Upgrade",
+      "type": "workflow",
+      "domain": "investing",
+      "status": "documented",
+      "description": "Auto-discovered workflow SOP. Not yet curated with dependencies.",
+      "file_path": "workflows/investing/swing-desk-upgrade.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/investing/swing-desk-upgrade.md",
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "depends_on": [],
+      "auto_discovered": true
+    },
+    {
+      "id": "wfauto_media_nano_banana",
+      "label": "Nano Banana",
+      "type": "workflow",
+      "domain": "infrastructure",
+      "status": "documented",
+      "description": "Auto-discovered workflow SOP. Not yet curated with dependencies.",
+      "file_path": "workflows/media/nano_banana.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/media/nano_banana.md",
       "icon_type": "emoji",
       "icon_value": "\ud83d\udcc4",
       "icon_url": null,
