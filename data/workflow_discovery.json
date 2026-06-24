@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-06-23T21:30:18.340Z",
-  "source": "github_tree",
+  "updated_at": "2026-06-24T02:29:59.164339+00:00",
+  "source": "filesystem",
   "code_repo": "pwholman06/parker-os",
   "discovered": [
     {
@@ -13,7 +13,22 @@
       "file_path": "workflows/espresso_yourself/booking_revenue_reporting.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/espresso_yourself/booking_revenue_reporting.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "depends_on": [],
+      "auto_discovered": true
+    },
+    {
+      "id": "wfauto_personal_brand_skool_community",
+      "label": "Skool Community",
+      "type": "workflow",
+      "domain": "social",
+      "status": "documented",
+      "description": "Auto-discovered workflow SOP. Not yet curated with dependencies.",
+      "file_path": "workflows/personal_brand/skool_community.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/skool_community.md",
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -28,7 +43,7 @@
       "file_path": "workflows/reminders.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/reminders.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
