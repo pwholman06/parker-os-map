@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-06-24T23:03:40.344250+00:00",
+  "updated_at": "2026-06-25T01:59:26.660518+00:00",
   "source": "trigger.dev_api",
   "run_count_fetched": 25,
   "statuses": {
-    "task_afterhours": "needs_testing",
+    "task_afterhours": "autonomous",
     "task_early_premarket": "autonomous",
     "task_eod_review": "autonomous",
     "task_midday_check": "needs_testing",
