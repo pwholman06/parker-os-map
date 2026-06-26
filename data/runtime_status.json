@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-06-26T17:34:12.390795+00:00",
+  "updated_at": "2026-06-26T21:16:00.754605+00:00",
   "source": "trigger.dev_api",
   "run_count_fetched": 25,
   "statuses": {
     "task_afterhours": "needs_testing",
     "task_early_premarket": "broken",
-    "task_eod_review": "needs_testing",
+    "task_eod_review": "autonomous",
     "task_midday_check": "autonomous",
     "task_morning_briefing": "autonomous",
     "task_morning_scan": "autonomous",
