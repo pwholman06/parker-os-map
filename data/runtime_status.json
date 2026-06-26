@@ -1,20 +1,20 @@
 {
-  "updated_at": "2026-06-26T21:30:37.237Z",
+  "updated_at": "2026-06-26T23:34:46.354795+00:00",
   "source": "trigger.dev_api",
   "run_count_fetched": 25,
   "statuses": {
-    "task_early_premarket": "broken",
-    "task_premarket": "broken",
-    "task_morning_scan": "autonomous",
-    "task_midday_check": "autonomous",
-    "task_eod_review": "autonomous",
     "task_afterhours": "needs_testing",
+    "task_early_premarket": "broken",
+    "task_eod_review": "autonomous",
+    "task_midday_check": "autonomous",
     "task_morning_briefing": "autonomous",
-    "task_weekly_perf": "needs_testing",
-    "task_weekly_content_analytics": "needs_testing",
-    "task_weekly_content_plan": "needs_testing",
+    "task_morning_scan": "autonomous",
+    "task_premarket": "broken",
     "task_schedule_post": "autonomous",
     "task_square_weekly": "needs_testing",
-    "task_system_map_update": "autonomous"
+    "task_system_map_update": "autonomous",
+    "task_weekly_content_analytics": "needs_testing",
+    "task_weekly_content_plan": "needs_testing",
+    "task_weekly_perf": "needs_testing"
   }
 }
