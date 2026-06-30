@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-30T18:21:36.879169+00:00",
+  "updated_at": "2026-06-30T18:41:43.304431+00:00",
   "source": "filesystem",
   "code_repo": "pwholman06/parker-os",
   "discovered": [
@@ -42,6 +42,21 @@
       "description": "Auto-discovered workflow SOP. Not yet curated with dependencies.",
       "file_path": "workflows/_meta/lessons/global.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/_meta/lessons/global.md",
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "depends_on": [],
+      "auto_discovered": true
+    },
+    {
+      "id": "wfauto__meta_lessons_scraping",
+      "label": "Scraping",
+      "type": "workflow",
+      "domain": "infrastructure",
+      "status": "documented",
+      "description": "Auto-discovered workflow SOP. Not yet curated with dependencies.",
+      "file_path": "workflows/_meta/lessons/scraping.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/_meta/lessons/scraping.md",
       "icon_type": "emoji",
       "icon_value": "\ud83d\udcc4",
       "icon_url": null,
