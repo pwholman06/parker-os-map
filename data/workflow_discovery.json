@@ -1,8 +1,23 @@
 {
-  "updated_at": "2026-06-29T21:30:22.098Z",
-  "source": "github_tree",
+  "updated_at": "2026-06-30T00:59:46.752584+00:00",
+  "source": "filesystem",
   "code_repo": "pwholman06/parker-os",
   "discovered": [
+    {
+      "id": "wfauto_espresso_yourself_bella_playbook",
+      "label": "Bella Playbook",
+      "type": "workflow",
+      "domain": "espresso_yourself",
+      "status": "documented",
+      "description": "Auto-discovered workflow SOP. Not yet curated with dependencies.",
+      "file_path": "workflows/espresso_yourself/bella_playbook.md",
+      "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/espresso_yourself/bella_playbook.md",
+      "icon_type": "emoji",
+      "icon_value": "\ud83d\udcc4",
+      "icon_url": null,
+      "depends_on": [],
+      "auto_discovered": true
+    },
     {
       "id": "wfauto_espresso_yourself_booking_revenue_reporting",
       "label": "Booking Revenue Reporting",
@@ -13,7 +28,7 @@
       "file_path": "workflows/espresso_yourself/booking_revenue_reporting.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/espresso_yourself/booking_revenue_reporting.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -28,7 +43,7 @@
       "file_path": "workflows/espresso_yourself/crm.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/espresso_yourself/crm.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -43,7 +58,7 @@
       "file_path": "workflows/espresso_yourself/crm_stage_lessons.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/espresso_yourself/crm_stage_lessons.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -58,7 +73,7 @@
       "file_path": "workflows/investing/swing-desk-upgrade.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/investing/swing-desk-upgrade.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -73,7 +88,7 @@
       "file_path": "workflows/media/nano_banana.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/media/nano_banana.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -88,7 +103,7 @@
       "file_path": "workflows/personal_brand/content_engine.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/content_engine.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -103,7 +118,7 @@
       "file_path": "workflows/personal_brand/content_engine_master_prompt.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/content_engine_master_prompt.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -118,7 +133,7 @@
       "file_path": "workflows/personal_brand/creator_tooling_research.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/creator_tooling_research.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -133,7 +148,7 @@
       "file_path": "workflows/personal_brand/editing_system.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/editing_system.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -148,7 +163,7 @@
       "file_path": "workflows/personal_brand/skool_community.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/personal_brand/skool_community.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
@@ -163,7 +178,7 @@
       "file_path": "workflows/reminders.md",
       "github_url": "https://github.com/pwholman06/parker-os/blob/main/workflows/reminders.md",
       "icon_type": "emoji",
-      "icon_value": "📄",
+      "icon_value": "\ud83d\udcc4",
       "icon_url": null,
       "depends_on": [],
       "auto_discovered": true
